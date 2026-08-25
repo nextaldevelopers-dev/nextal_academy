@@ -55,9 +55,9 @@
   --text-xl: clamp(1.5rem, 3vw + 0.5rem, 2.25rem);
   --text-2xl: clamp(2rem, 4vw + 1rem, 3.2rem);
   --text-3xl: clamp(2.5rem, 5vw + 1rem, 4rem);
-  --text-4xl: clamp(3rem, 6vw + 1rem, 4.5rem);
-  --text-5xl: clamp(3.5rem, 8vw + 1rem, 5.5rem);
-  --text-6xl: clamp(4rem, 10vw + 1rem, 7rem);
+  --text-4xl: clamp(2rem, 5vw + 1rem, 4.5rem);
+  --text-5xl: clamp(2.5rem, 6vw + 0.5rem, 5.5rem);
+  --text-6xl: clamp(3rem, 10vw + 1rem, 7rem);
 
   /* ―― Fluid Spacing ―― */
   --space-xs: clamp(0.25rem, 0.5vw + 0.1rem, 0.5rem);
@@ -520,72 +520,28 @@ img {
 
 .anim-text, .anim-button, .anim-image, .anim-card, .anim-nav, .anim-badge {
   opacity: 0;
-  will-change: opacity, transform, filter;
-  transition: opacity var(--reveal-duration, var(--anim-duration)) var(--anim-ease), 
-              transform var(--reveal-duration, var(--anim-duration)) var(--anim-ease),
-              filter var(--reveal-duration, var(--anim-duration)) var(--anim-ease);
-}
-
-.anim-nav {
   transform: translateY(40px);
-  filter: blur(5px);
+  transition: opacity var(--anim-duration) var(--anim-ease), transform var(--anim-duration) var(--anim-ease);
 }
-
-.anim-text, .anim-badge {
-  transform: translateY(40px);
-  filter: blur(8px);
-}
-
-.anim-button {
-  transform: translateY(40px);
-  filter: blur(4px);
-}
-
-.anim-image {
-  transform: translateY(40px);
-  filter: blur(4px);
-}
-
-.anim-card {
-  transform: translateY(40px);
-  filter: blur(10px);
-  transition-delay: calc(80ms * var(--card-index, 0));
-}
-
-/* Revealed State */
-.premium-revealed .anim-text,
-.premium-revealed .anim-button,
-.premium-revealed .anim-image,
-.premium-revealed .anim-card,
-.premium-revealed .anim-badge,
-.premium-revealed.anim-nav,
-.premium-revealed .anim-nav
-{
+.anim-text.is-visible, .anim-button.is-visible, .anim-image.is-visible, .anim-card.is-visible, .anim-nav.is-visible, .anim-badge.is-visible {
   opacity: 1;
   transform: translateY(0);
-  filter: blur(0);
 }
 
-/* Stagger Delays */
-.delay-0 { transition-delay: 0ms; }
-.delay-1 { transition-delay: 100ms; }
-.delay-2 { transition-delay: 180ms; }
-.delay-3 { transition-delay: 260ms; }
-.delay-4 { transition-delay: 340ms; }
-.delay-5 { transition-delay: 420ms; }
-.delay-6 { transition-delay: 520ms; }
-.delay-7 { transition-delay: 700ms; }
-
-/* Fade-out has no stagger — elements exit simultaneously for clean reverse scroll */
-:not(.premium-revealed) > .delay-1,
-:not(.premium-revealed) > .delay-2,
-:not(.premium-revealed) > .delay-3,
-:not(.premium-revealed) > .delay-4,
-:not(.premium-revealed) > .delay-5,
-:not(.premium-revealed) > .delay-6,
-:not(.premium-revealed) > .delay-7 {
-  transition-delay: 0ms;
+/* Base stagger delay for programmatic lists */
+[style*="--card-index"] {
+  transition-delay: calc(var(--card-index, 0) * 0.1s);
 }
+
+/* Stagger delay classes */
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.15s; }
+.delay-3 { transition-delay: 0.2s; }
+.delay-4 { transition-delay: 0.25s; }
+.delay-5 { transition-delay: 0.3s; }
+.delay-6 { transition-delay: 0.35s; }
+.delay-7 { transition-delay: 0.4s; }
+
 .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 1.75rem; }
 .feature-card { display: flex; flex-direction: column; height: 100%; background-color: var(--bg-surface); border-radius: var(--radius-md); padding: 2rem; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); transition: all var(--transition-normal); position: relative; overflow: hidden; }
 .feature-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: rgba(246, 36, 119, 0.25); }
@@ -1382,7 +1338,7 @@ img {
   text-align: center;
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Sliding Shutter Panel (Decor) Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* Ã¢â€ â‚¬Ã¢â€ â‚¬ Sliding Shutter Panel (Decor) Ã¢â€ â‚¬Ã¢â€ â‚¬ */
 .premium-shutter-layer {
   position: absolute;
   top: 0;
@@ -1419,7 +1375,7 @@ img {
   to { transform: translateX(-50%); }
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Text Specific Shutter Panels (For precise color splitting) Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* Ã¢â€ â‚¬Ã¢â€ â‚¬ Text Specific Shutter Panels (For precise color splitting) Ã¢â€ â‚¬Ã¢â€ â‚¬ */
 .text-shutter-yellow {
   position: absolute;
   top: 0;
@@ -1478,7 +1434,7 @@ img {
   to { transform: translateX(50%); }
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Course Detail Page Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* Ã¢â€ â‚¬Ã¢â€ â‚¬ Course Detail Page Ã¢â€ â‚¬Ã¢â€ â‚¬ */
 .course-detail-page {
   padding-bottom: var(--section-spacing-lg);
   background-color: #ffffff;
@@ -1686,7 +1642,7 @@ img {
 
 /* â”€â”€ Hardware Acceleration & Performance â”€â”€ */
 .anim-text, .anim-image, .anim-card, .anim-button {
-  will-change: transform, opacity;
+  /* Removed will-change to fix text blur on Windows browsers */
 }
 .hero-image-frame {
   content-visibility: auto;

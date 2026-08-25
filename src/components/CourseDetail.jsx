@@ -11,24 +11,7 @@ import {
 import '../course-premium.css';
 
 // Intersection Observer Hook for reveal animations
-function useScrollObserver(dependency) {
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-revealed');
-        }
-      });
-    }, { threshold: 0, rootMargin: '0px 0px -50px 0px' });
-
-    const elements = document.querySelectorAll('.reveal-up, .reveal-scale, .reveal-blur');
-    elements.forEach(el => observer.observe(el));
-
-    return () => {
-      elements.forEach(el => observer.unobserve(el));
-    };
-  }, [dependency]);
-}
+// using global GSAP for animations
 
 export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -36,7 +19,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
   const cursorRef = useRef(null);
   const timelineRef = useRef(null);
   
-  useScrollObserver(slug);
+  // removed useScrollObserver
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -555,7 +538,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
             opacity: 0;
             transform: translateY(20px);
           }
-          .is-revealed .text-reveal {
+          .is-visible .text-reveal {
             animation: slideUpFade 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
           }
           @keyframes popIn {
@@ -567,7 +550,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
             transform: scale(0.85);
             transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s ease, box-shadow 0.3s ease !important;
           }
-          .is-revealed .expandable-pill {
+          .is-visible .expandable-pill {
             animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
           }
           .expandable-pill:hover {
@@ -619,14 +602,14 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       <div className="container-fluid" style={{ position: 'relative', zIndex: 10 }}>
         
         {/* Back Button */}
-        <div className="reveal-up" style={{ paddingBlock: 'var(--section-spacing-md)' }}>
+<div className="anim-card delay-2" style={{ paddingBlock: 'var(--section-spacing-md)' }}>
           <button className="btn btn-secondary back-btn" onClick={onBack} style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.05)' }}>
             <ArrowLeft size={16} /> Back to Course Overview
           </button>
         </div>
 
         {/* Hero Section */}
-        <div className="course-detail-hero glass-card reveal-scale">
+        <div className="course-detail-hero glass-card anim-image delay-1">
           <div className="course-detail-content">
             <h1 className="course-detail-title">{module.title}</h1>
             <p className="course-detail-desc">{module.desc}</p>
@@ -637,14 +620,14 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
           <div className="course-detail-media" style={{ boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
             <picture>
               <source media="(max-width: 768px)" srcSet={`${module.image}?w=480`} />
-              <img src={module.image} alt={module.title} width="600" height="400" style={{ width: '100%', height: 'auto', aspectRatio: '3/2', objectFit: 'cover' }} loading="lazy" decoding="async" />
+              <img src={module.image} alt={module.title} width="600" height="400" style={{ width: '100%', height: 'auto', aspectRatio: '3/2', objectFit: 'cover' }} fetchpriority="high" decoding="async" />
             </picture>
           </div>
         </div>
 
         {/* Course Includes Section */}
         {module.courseIncludes && (
-          <div className="course-includes-section reveal-up stagger-container">
+          <div className="course-includes-section anim-card delay-2 stagger-container">
             <h2 className="premium-heading">This Course Includes</h2>
             <div className="premium-pill-grid">
               {module.courseIncludes.map((item, idx) => (
@@ -660,7 +643,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
 
         {/* Weekly Modules Section */}
         {module.weeklyModules && (
-          <div className="course-detail-section reveal-blur stagger-container">
+          <div className="course-detail-section anim-card delay-2 stagger-container">
             <h2 className="premium-heading">Weekly Curriculum</h2>
             <div className="module-premium-grid">
               {module.weeklyModules.map((week, idx) => (
@@ -676,7 +659,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
 
         {/* What You Will Learn Section */}
         {!module.weeklyModules && module.topics && module.topics.length > 0 && (
-          <div className="course-detail-section reveal-blur stagger-container">
+          <div className="course-detail-section anim-card delay-2 stagger-container">
             <h2 className="premium-heading">What You Will Learn</h2>
             <div className="module-premium-grid">
               {module.topics.map((t, idx) => (
@@ -694,7 +677,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
 
         {/* Learning Process Roadmap */}
         {module.learningProcess && (
-          <div className="learning-process-section reveal-up">
+          <div className="learning-process-section anim-card delay-2">
             <div style={{ textAlign: 'center' }}>
               <h2 className="premium-heading">Your Learning Roadmap</h2>
             </div>
@@ -722,7 +705,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
 
         {/* Salary Insights Cards */}
         {module.salaryInsights && (
-          <div className="salary-insights-section reveal-scale">
+          <div className="salary-insights-section anim-card delay-2">
             <h2 className="premium-heading">Salary Insights (India)</h2>
             <p style={{ color: '#64748b', marginTop: '0.5rem' }}>Estimated market compensation based on current industry data.</p>
             
@@ -739,7 +722,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         )}
 
         {/* What You'll Walk Away With Section */}
-        <div className="walk-away-section reveal-up stagger-container">
+        <div className="walk-away-section anim-card delay-2 stagger-container">
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <h2 className="premium-heading" style={{ fontSize: '2rem' }}>What You'll Walk Away With</h2>
           </div>
@@ -780,7 +763,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         </div>
           
         {/* Academy Content Section */}
-        <div className="academy-content-section glass-card reveal-blur fluid-mesh-bg" style={{ color: 'white' }}>
+        <div className="academy-content-section glass-card anim-card delay-3 fluid-mesh-bg" style={{ color: 'white' }}>
           <div className="academy-content-inner">
             <div className="academy-content-text pill-container-wrapper" style={{ textAlign: 'center', maxWidth: '100%', margin: '0 auto', padding: '0 1rem' }}>
               <h2 className="text-reveal" style={{ color: 'white', marginBottom: '1.5rem', fontSize: '2.5rem', fontWeight: 600, WebkitTextFillColor: 'initial', background: 'none' }}>Why Choose Nextal Academy?</h2>

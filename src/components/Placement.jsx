@@ -29,7 +29,7 @@ export default function Placement({ onBack }) {
             </p>
 
             <h3 className="placement-subheading" style={{ fontSize: 'var(--text-xl)', color: 'var(--navy-deep)', marginTop: 'var(--space-lg)', marginBottom: 'var(--space-md)', fontWeight: '700' }}>
-              What They Lacks Off
+              What They Lack
             </h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {[

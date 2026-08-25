@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Video, Wand2, Smartphone, Database, Brain, Network, Briefcase, Handshake } from 'lucide-react';
+import gsap from 'gsap';
 
 const services = [
   { id: 0, icon: Video, title: "Video Editing", subtitle: "Adobe Premiere Pro", desc: "Cinematic cuts & professional grading", slug: "video-editing", label: "PRO", bgColor: "#ffe8e8", color: "#d32f2f" },
@@ -27,6 +28,7 @@ export default function WhyUs({ onSelectService }) {
   const [quoteIdx, setQuoteIdx] = useState(0);
   const [quoteVisible, setQuoteVisible] = useState(true);
 
+  const whyusSectionRef = useRef(null);
   const containerRef = useRef(null);
   const cardRefs = useRef([]);
   const lineRefs = useRef([]);
@@ -347,7 +349,7 @@ export default function WhyUs({ onSelectService }) {
   );
 
   return (
-    <section id="why-us" className="section why-us-interactive-section" style={{ position: 'relative', backgroundColor: '#ffffff', overflow: 'hidden' }}>
+    <section id="why-us" className="section why-us-interactive-section" ref={whyusSectionRef} style={{ position: 'relative', backgroundColor: '#ffffff', overflow: 'hidden' }}>
       {/* Background Ambience / Subtle Glowing Nodes & Blobs */}
       <div className="orbit-ambient-dots">
         <div className="ambient-dot p1"></div>

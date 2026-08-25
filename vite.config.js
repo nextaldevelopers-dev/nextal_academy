@@ -8,17 +8,37 @@ export default defineConfig({
     open: true
   },
   build: {
-    // Split vendor chunks so browsers can cache React separately from app code
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-gsap':  ['gsap'],
-          'vendor-icons': ['lucide-react'],
-          'vendor-three': ['three', '@react-three/fiber', '@react-three/drei'],
+        manualChunks(id) {
+          // Three.js — huge (938KB), only used in lazy HeroScene
+          // Keep it in its own chunk so it's NEVER preloaded with the page
+          if (id.includes('node_modules/three') ||
+              id.includes('@react-three/fiber') ||
+              id.includes('@react-three/drei')) {
+            return 'vendor-three';
+          }
+          // GSAP — needed globally but can be loaded after FCP
+          if (id.includes('node_modules/gsap')) {
+            return 'vendor-gsap';
+          }
+          // Lucide icons — tree-shakeable, keep separate for caching
+          if (id.includes('node_modules/lucide-react')) {
+            return 'vendor-icons';
+          }
+          // React + ReactDOM — critical, must load first
+          if (id.includes('node_modules/react-dom') ||
+              id.includes('node_modules/react/') ||
+              id.includes('node_modules/react-router')) {
+            return 'vendor-react';
+          }
         }
       }
     },
+    // Disable automatic modulepreload injection for ALL chunks.
+    // This prevents vendor-three (938KB) from being preloaded on every page.
+    // The browser will still load chunks on demand via dynamic import().
+    modulePreload: false,
     // Raise chunk size warning limit slightly
     chunkSizeWarningLimit: 1000,
     // Minify with esbuild (default, very fast)

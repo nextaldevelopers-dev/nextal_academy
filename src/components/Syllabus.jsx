@@ -60,6 +60,7 @@ import {
   Mail,
   Star
 } from 'lucide-react';
+import gsap from 'gsap';
 
 const AnimatedCounter = ({ target, suffix, delay, color = '#000000' }) => {
   const [count, setCount] = React.useState(0);
@@ -382,7 +383,7 @@ export default function Syllabus() {
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % modules.length);
     setProgress(0);
-    startTimeRef.current = null;
+    if (startTimeRef) startTimeRef.current = null;
   };
 
   const handlePrev = () => {

@@ -45,11 +45,21 @@ export default function Highlights() {
       const updateGeometry = () => {
         if (!containerRef.current) return;
         const w = containerRef.current.offsetWidth;
-        // Clamp radius to ensure a beautiful wide arc on all screens
-        radius = Math.max(w * 0.9, 700) / 2; 
+        
+        // Dynamically calculate node size based on CSS breakpoints to ensure nodes don't overflow
+        const nodeSize = window.innerWidth > 480 ? Math.min(200, window.innerWidth * 0.16) : 130;
+        
+        // Calculate safe diameter: Container width minus node size and some padding
+        const safeDiameter = Math.max(w - nodeSize - 20, 240); 
+        
+        // Optional: on very large screens, we can still cap or scale the radius
+        radius = window.innerWidth > 1024 ? Math.max(w * 0.7, 700) / 2 : safeDiameter / 2;
+        
         centerX = w / 2;
-        // Push center down so the full ring (140px half-height) sits inside the wrapper
-        centerY = radius + 175; 
+        // Push center down so the full ring sits inside the wrapper
+        // On smaller screens, we don't need as much vertical offset
+        const verticalOffset = window.innerWidth > 768 ? 175 : 120;
+        centerY = radius + verticalOffset;
 
         // Update the visual background arc path
         if (arcRef.current) {
@@ -177,9 +187,13 @@ export default function Highlights() {
     mm.add("(prefers-reduced-motion: reduce)", () => {
        if (!containerRef.current) return;
        const w = containerRef.current.offsetWidth;
-       const radius = Math.max(w * 0.9, 700) / 2;
+       const nodeSize = window.innerWidth > 480 ? Math.min(200, window.innerWidth * 0.16) : 130;
+       const safeDiameter = Math.max(w - nodeSize - 20, 240); 
+       const radius = window.innerWidth > 1024 ? Math.max(w * 0.7, 700) / 2 : safeDiameter / 2;
+       
        const centerX = w / 2;
-       const centerY = radius + 175;
+       const verticalOffset = window.innerWidth > 768 ? 175 : 120;
+       const centerY = radius + verticalOffset;
        
        if (arcRef.current) {
           gsap.set(arcRef.current, { width: radius * 2, height: radius * 2, top: centerY - radius });

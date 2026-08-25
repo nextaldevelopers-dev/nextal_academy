@@ -82,6 +82,7 @@ export default function Header({ onOpenEnrollModal }) {
               <a href="#syllabus" className="nav-link dropdown-toggle" onClick={(e) => {
                 if (window.innerWidth < 1024) {
                   e.preventDefault();
+                  e.stopPropagation();
                   setMobileDropdownOpen(!mobileDropdownOpen);
                 } else {
                   closeNav();
@@ -94,6 +95,7 @@ export default function Header({ onOpenEnrollModal }) {
                   <div className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
                     if (window.innerWidth < 1024) {
                       e.preventDefault();
+                      e.stopPropagation();
                       setMobileSubDropdownOpen(mobileSubDropdownOpen === 'digital' ? null : 'digital');
                     }
                   }}>
@@ -109,6 +111,7 @@ export default function Header({ onOpenEnrollModal }) {
                   <div className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
                     if (window.innerWidth < 1024) {
                       e.preventDefault();
+                      e.stopPropagation();
                       setMobileSubDropdownOpen(mobileSubDropdownOpen === 'design' ? null : 'design');
                     }
                   }}>
@@ -140,6 +143,7 @@ export default function Header({ onOpenEnrollModal }) {
                   <div className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
                     if (window.innerWidth < 1024) {
                       e.preventDefault();
+                      e.stopPropagation();
                       setMobileSubDropdownOpen(mobileSubDropdownOpen === 'video' ? null : 'video');
                     }
                   }}>

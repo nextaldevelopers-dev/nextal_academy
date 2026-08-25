@@ -1,53 +1,75 @@
 import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { CheckCircle2, Award, Bot, Send, BookOpen, Clapperboard } from 'lucide-react';
+import gsap from 'gsap';
 
 const HeroScene = lazy(() => import('./HeroScene'));
 
 export default function Hero({ onOpenEnrollModal }) {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
   const [shouldLoad3D, setShouldLoad3D] = useState(false);
   const heroRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize(); // Initial check
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
-    let observer;
-    
-    if (heroRef.current) {
-      observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting) {
-            // Delay loading the 3D scene significantly so it doesn't block initial page load (FCP/LCP/TTI)
-            setTimeout(() => {
-              if ('requestIdleCallback' in window) {
-                window.requestIdleCallback(() => setShouldLoad3D(true), { timeout: 1000 });
-              } else {
-                setShouldLoad3D(true);
-              }
-            }, 2500);
-            if (observer) {
-              observer.disconnect();
-            }
-          }
-        },
-        {
-          rootMargin: '200px'
+    let interactionFired = false;
+    const load3D = () => {
+      if (!interactionFired) {
+        interactionFired = true;
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(() => setShouldLoad3D(true), { timeout: 1000 });
+        } else {
+          setShouldLoad3D(true);
         }
-      );
-      
-      observer.observe(heroRef.current);
-    }
-
-    return () => {
-      if (observer) {
-        observer.disconnect();
       }
     };
+
+    const events = ['scroll', 'mousemove', 'touchstart', 'keydown'];
+    events.forEach(event => window.addEventListener(event, load3D, { once: true, passive: true }));
+
+    // Fallback if no interaction happens
+    const timeout = setTimeout(load3D, 4000);
+
+    return () => {
+      events.forEach(event => window.removeEventListener(event, load3D));
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  // GSAP Parallax & Zoom Effects
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Robot parallax & subtle zoom
+      gsap.to('.hero-media-wrapper', {
+        scale: 1.08,
+        y: 40,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+
+      // Text parallax (moves up slightly faster)
+      gsap.to('.hero-content', {
+        y: -40,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+    }, heroRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (
@@ -56,17 +78,18 @@ export default function Hero({ onOpenEnrollModal }) {
         <div className="hero-grid">
           <div className="hero-content">
 
-            <h1 className="hero-title anim-text delay-2">
-              <span className="laptop-nowrap">Master <span className="accent">Creative AI</span></span>
-              <br className="laptop-break" />
-              <span className="laptop-nowrap">& Build Your Future</span>
+            <h1 className="hero-title anim-text delay-2" style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>
+              Master <span className="accent">Creative AI</span>
+              <br />
+              & Build Your Future
             </h1>
 
             <div className="hero-evolution-steps anim-text delay-3" style={{ 
               display: 'flex', 
-              flexWrap: 'nowrap', 
+              flexWrap: 'wrap', 
               gap: 'clamp(0.4rem, 2vw, 0.8rem)', 
               alignItems: 'center',
+              justifyContent: 'flex-start',
               marginBottom: '1.5rem',
               fontSize: 'clamp(0.85rem, 2.5vw, 1.1rem)',
               fontWeight: '700',
@@ -87,7 +110,7 @@ export default function Hero({ onOpenEnrollModal }) {
               <span style={{ fontSize: '1.2em', fontWeight: '900', letterSpacing: '0.15em' }}>BECOME</span>
             </div>
 
-            <p className="hero-subtitle anim-text delay-4" style={{ maxWidth: '100%', color: '#d3d3d3' }}>
+            <p className="hero-subtitle anim-text delay-4" style={{ maxWidth: '600px', color: '#d3d3d3' }}>
               Premium Job-Oriented Academy in Nagercoil. Master Video Editing, Motion Graphics, Full Stack Development, and Advanced Generative AI to launch your dream career.
             </p>
 

@@ -4,6 +4,10 @@ import Hero from './components/Hero';
 import useFPSMonitor from './hooks/useFPSMonitor';
 import LoadingScreen from './components/LoadingScreen';
 import Lenis from '@studio-freight/lenis';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 // ── Lazy load below-fold & route-only components ──────────────────────────
 const WhyUs       = React.lazy(() => import('./components/WhyUs'));
@@ -23,23 +27,6 @@ const ComingSoon    = React.lazy(() => import('./components/ComingSoon'));
 // Premium Fallback
 const PageFallback = () => <LoadingScreen isFadingOut={false} />;
 
-const LazySection = ({ children }) => {
-  const [isVisible, setIsVisible] = React.useState(false);
-  const ref = React.useRef();
-
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsVisible(true);
-        observer.disconnect();
-      }
-    }, { rootMargin: '200px' });
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return <div ref={ref}>{isVisible ? children : <div style={{ height: '100vh' }} />}</div>;
-};
 
 export default function App() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -50,8 +37,11 @@ export default function App() {
   // Start FPS Monitor
   useFPSMonitor();
 
-  // Initialize Lenis smooth scrolling
+  // Initialize Lenis smooth scrolling AFTER loading screen fades (post-FCP)
+  // Deferring prevents 4+ seconds of GSAP/Lenis CPU work from blocking LCP
   useEffect(() => {
+    if (initialLoading) return; // Wait until loading screen is gone
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -63,26 +53,31 @@ export default function App() {
       touchMultiplier: 2,
       infinite: false,
     });
+    
+    window.lenis = lenis;
 
     // Add scroll velocity hook for dynamic animation durations
     lenis.on('scroll', (e) => {
       const velocity = Math.abs(e.velocity || 0);
-      let duration = 1.2 - (velocity * 0.2); 
-      duration = Math.max(0.3, Math.min(duration, 1.2)); // Clamp between 0.3s and 1.2s
+      let duration = 1.2 - (velocity * 0.2);
+      duration = Math.max(0.3, Math.min(duration, 1.2));
       document.documentElement.style.setProperty('--reveal-duration', `${duration.toFixed(2)}s`);
     });
 
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+    // Synchronize Lenis scrolling with GSAP's ScrollTrigger
+    lenis.on('scroll', ScrollTrigger.update);
 
-    requestAnimationFrame(raf);
+    // Use GSAP's ticker for Lenis RAF to avoid double-RAF issues
+    const rafCallback = (time) => lenis.raf(time * 1000);
+    gsap.ticker.add(rafCallback);
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
+      gsap.ticker.remove(rafCallback);
+      if (window.lenis === lenis) delete window.lenis;
       lenis.destroy();
     };
-  }, []);
+  }, [initialLoading]);
 
   useEffect(() => {
     let timeoutMs = 800; // Standard connection
@@ -110,43 +105,56 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Scroll reveal — runs after paint and watches for lazy-loaded DOM elements
+  // Recalculate GSAP positions when navigating (only after loading is done)
+  useEffect(() => {
+    if (initialLoading) return;
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [currentPath, initialLoading]);
+
+  // Global IntersectionObserver Reveal (Lightweight, Replaces GSAP for basic reveals)
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('premium-revealed');
-        } else {
-          entry.target.classList.remove('premium-revealed');
+      entries.forEach((entry) => {
+        // If intersecting or if it's already above the viewport (e.g. user scrolled past before JS loaded)
+        if (entry.isIntersecting || entry.boundingClientRect.top < window.innerHeight * 0.9) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.12, rootMargin: "-5% 0px -5% 0px" });
-
-    const observeNewElements = () => {
-      const sections = document.querySelectorAll(
-        'section:not(.reveal-observed), .hero-section:not(.reveal-observed), .site-footer:not(.reveal-observed), .observe-root:not(.reveal-observed)'
-      );
-      sections.forEach(sec => {
-        sec.classList.add('reveal-observed');
-        observer.observe(sec);
-      });
-    };
-
-    // Initial check
-    observeNewElements();
-
-    // Watch for lazy-loaded components entering the DOM
-    const mutationObserver = new MutationObserver(() => {
-      observeNewElements();
+    }, {
+      root: null,
+      rootMargin: '0px 0px -5% 0px', // Trigger slightly before the bottom
+      threshold: 0
     });
 
+    const applyObserver = () => {
+      const elements = document.querySelectorAll('.anim-text:not(.is-visible), .anim-image:not(.is-visible), .anim-card:not(.is-visible), .anim-button:not(.is-visible)');
+      elements.forEach((el) => observer.observe(el));
+    };
+
+    applyObserver();
+
+    let mutationTimeout;
+    const handleMutations = () => {
+      clearTimeout(mutationTimeout);
+      mutationTimeout = setTimeout(() => {
+        applyObserver();
+        ScrollTrigger.refresh(); // Still refresh GSAP for other components that might use it
+      }, 50);
+    };
+
+    const mutationObserver = new MutationObserver(handleMutations);
     mutationObserver.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       observer.disconnect();
       mutationObserver.disconnect();
+      clearTimeout(mutationTimeout);
     };
-  }, []);
+  }, [currentPath]);
 
   // Global anchor interceptor
   useEffect(() => {
@@ -173,7 +181,11 @@ export default function App() {
             const el = document.querySelector(href);
             if (el) {
               clearInterval(checkExist);
-              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              if (window.lenis) {
+                window.lenis.scrollTo(el, { offset: -80 }); // Account for sticky header
+              } else {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
             }
             attempts++;
             if (attempts > 30) clearInterval(checkExist); // Give up after 3 seconds
@@ -203,6 +215,41 @@ export default function App() {
     window.history.pushState({}, '', '/');
     window.dispatchEvent(new Event('popstate'));
   };
+
+  // SEO: Update document title dynamically based on route
+  useEffect(() => {
+    let title = 'Nextal Academy Nagercoil | Video Editing, AI & Design Courses';
+    let desc = 'Nextal Academy – Nagercoil\'s premier job-oriented training institute. Master Video Editing, Motion Graphics, Generative AI, Graphic Design, Web & App Development. 100% placement support.';
+
+    if (currentPath.startsWith('/course/')) {
+      const slug = currentPath.replace('/course/', '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      title = `${slug} Course | Nextal Academy Nagercoil`;
+      desc = `Enroll in ${slug} at Nextal Academy Nagercoil. Job-oriented training with live projects, industry mentors & placement support.`;
+    } else if (currentPath.startsWith('/services/')) {
+      const slug = currentPath.replace('/services/', '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      title = `${slug} | Nextal Academy Nagercoil`;
+      desc = `Explore ${slug} services at Nextal Academy Nagercoil. Professional training and career guidance for aspiring creatives.`;
+    } else if (currentPath === '/placement') {
+      title = 'Placement Record | Nextal Academy Nagercoil';
+      desc = 'See our students\' success stories. Nextal Academy Nagercoil offers 100% placement support in video editing, design, AI and tech fields.';
+    } else if (currentPath === '/blogs') {
+      title = 'Blogs & News | Nextal Academy Nagercoil';
+      desc = 'Read the latest articles on video editing, AI, design trends and career tips from Nextal Academy Nagercoil experts.';
+    }
+
+    document.title = title;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', desc);
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', title);
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', desc);
+    const twTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twTitle) twTitle.setAttribute('content', title);
+    const twDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twDesc) twDesc.setAttribute('content', desc);
+  }, [currentPath]);
+
 
   const normalizedPath = currentPath.replace(/\/+$/, '') || '/';
   
@@ -235,13 +282,11 @@ export default function App() {
         ) : (
           <main>
             <Hero onOpenEnrollModal={() => setModalOpen(true)} />
-            <LazySection>
-              <WhyUs onSelectService={handleSelectService} />
-              <Syllabus />
-              <Highlights />
-              <Faq />
-              <CtaBanner onOpenEnrollModal={() => setModalOpen(true)} />
-            </LazySection>
+            <WhyUs onSelectService={handleSelectService} />
+            <Syllabus />
+            <Highlights />
+            <Faq />
+            <CtaBanner onOpenEnrollModal={() => setModalOpen(true)} />
           </main>
         )}
 
