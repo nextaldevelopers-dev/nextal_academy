@@ -631,7 +631,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
             <img
               src={module.image}
               srcSet={module.image
-                ? `${module.image.replace('.webp', '-300.webp')} 300w, ${module.image.replace('.webp', '-600.webp')} 600w, ${module.image} 800w`
+                ? `${encodeURI(module.image.replace('.webp', '-300.webp'))} 300w, ${encodeURI(module.image.replace('.webp', '-600.webp'))} 600w, ${encodeURI(module.image)} 800w`
                 : undefined
               }
               sizes="(max-width: 768px) 300px, (max-width: 1200px) 600px, 800px"

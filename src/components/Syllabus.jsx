@@ -493,7 +493,7 @@ export default function Syllabus() {
                     <img
                       src={m.image}
                       srcSet={m.image
-                        ? `${m.image.replace('.webp', '-300.webp')} 300w, ${m.image.replace('.webp', '-600.webp')} 600w, ${m.image} 800w`
+                        ? `${encodeURI(m.image.replace('.webp', '-300.webp'))} 300w, ${encodeURI(m.image.replace('.webp', '-600.webp'))} 600w, ${encodeURI(m.image)} 800w`
                         : undefined
                       }
                       sizes="(max-width: 768px) 300px, (max-width: 1200px) 600px, 800px"
