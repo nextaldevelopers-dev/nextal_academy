@@ -155,10 +155,10 @@ export default function ServiceDetail({ slug, onBack, onOpenEnrollModal }) {
       <Helmet>
         <title>{service.title} | Nextal Academy Nagercoil</title>
         <meta name="description" content={service.desc} />
-        <link rel="canonical" href={`https://nextalacademy.in/service/${slug}`} />
+        <link rel="canonical" href={`https://nextalacademy.com/service/${slug}`} />
         <meta property="og:title" content={`${service.title} | Nextal Academy`} />
         <meta property="og:description" content={service.desc} />
-        <meta property="og:url" content={`https://nextalacademy.in/service/${slug}`} />
+        <meta property="og:url" content={`https://nextalacademy.com/service/${slug}`} />
       </Helmet>
       <div className="container">
         {/* Back Button */}

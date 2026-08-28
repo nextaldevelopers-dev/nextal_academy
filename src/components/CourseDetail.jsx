@@ -519,11 +519,11 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       <Helmet>
         <title>{module ? `${module.title.replace(/\n/g, ' ')} | Nextal Academy Nagercoil` : 'Course | Nextal Academy'}</title>
         <meta name="description" content={module ? module.desc : 'Explore our job-oriented courses at Nextal Academy Nagercoil.'} />
-        <link rel="canonical" href={`https://nextalacademy.in/course/${slug}`} />
+        <link rel="canonical" href={`https://nextalacademy.com/course/${slug}`} />
         <meta property="og:title" content={module ? `${module.title.replace(/\n/g, ' ')} | Nextal Academy` : 'Course | Nextal Academy'} />
         <meta property="og:description" content={module ? module.desc : ''} />
-        <meta property="og:url" content={`https://nextalacademy.in/course/${slug}`} />
-        <meta property="og:image" content={module?.image ? `https://nextalacademy.in${module.image}` : 'https://nextalacademy.in/academy_logo.webp'} />
+        <meta property="og:url" content={`https://nextalacademy.com/course/${slug}`} />
+        <meta property="og:image" content={module?.image ? `https://nextalacademy.com${module.image}` : 'https://nextalacademy.com/academy_logo.webp'} />
       </Helmet>
       <style>
         {`

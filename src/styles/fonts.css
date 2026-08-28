@@ -1,6 +1,6 @@
 /* =========================================================================
  * Self-hosted fonts — eliminates Google Fonts network dependency chain
- * (eliminates ~1.7s critical chain from nextalacademy.in → fonts.googleapis.com → fonts.gstatic.com)
+ * (eliminates ~1.7s critical chain from nextalacademy.com → fonts.googleapis.com → fonts.gstatic.com)
  * ========================================================================= */
 
 /* Poppins — body text (--font-body) */
