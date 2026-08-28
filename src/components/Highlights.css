@@ -8,10 +8,10 @@
   min-height: 800px;
   
   /* Fluid sizing tokens for Spotlight Carousel */
-  --sl-node-size: clamp(160px, 16vw, 200px);   /* White card inner circle */
-  --sl-ring-size: clamp(210px, 28vw, 280px);   /* Gradient donut ring — larger */
-  --sl-ring-thickness: clamp(22px, 2.5vw, 36px); /* Donut ring thickness */
-  --sl-dashed-inset: clamp(-10px, -1.5vw, -14px);
+  --sl-node-size: clamp(140px, 16vw, 180px);   /* White card inner circle */
+  --sl-ring-size: clamp(210px, 28vw, 290px);   /* Gradient donut ring */
+  --sl-ring-thickness: clamp(18px, 2.2vw, 30px); /* Donut ring thickness */
+  --sl-dashed-inset: clamp(-16px, -2vw, -24px); /* Larger gap for dashed outer ring */
   --sl-wrapper-height: clamp(340px, 44vw, 500px); /* Extra height so ring top has room */
 }
 
@@ -24,6 +24,7 @@
   font-weight: 600;
   background: linear-gradient(to right, #F62477, #5E086B);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
   padding-bottom: 0.15em; /* Prevent descenders from clipping */
@@ -123,6 +124,9 @@
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
           mask-composite: exclude;
   opacity: 1;
@@ -187,6 +191,7 @@
   color: #1a1a1a !important; /* Dark text for active, matching reference */
   background: none !important;
   -webkit-background-clip: unset !important;
+  background-clip: unset !important;
   -webkit-text-fill-color: unset !important;
 }
 

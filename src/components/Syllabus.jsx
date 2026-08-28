@@ -319,9 +319,9 @@ export default function Syllabus() {
       id: 'adv-gen-ai',
       title: <>Advanced&nbsp;Certification<br/>in Gen AI</>,
       tabLabel: '10. Gen AI',
-      image: '/genai&agenai.webp',
+      image: '/genai_and_agenai.webp',
       icon: <Brain size={18} />,
-      desc: 'Master Generative AI, Large Language Models (LLMs), RAG, AI Agents, LangChain, LangGraph, CrewAI, MCP, Fine-Tuning, and production-ready AI application development through hands-on projects and real-world engineering practices.',
+      desc: 'Master Generative AI, LLMs, RAG, and AI Agents to build production-ready applications through hands-on real-world engineering projects.',
       highlights: [
         'OpenAI API, Prompting & LangChain',
         'RAG, Vector DBs & Local LLMs',
@@ -404,42 +404,49 @@ export default function Syllabus() {
           <div className="premium-slider-container anim-image delay-4">
             {/* Left Content Area */}
             <div className="slider-content-area">
-              {modules.map((m, idx) => (
-                <div 
-                  key={m.id} 
-                  className={`slider-content-slide ${idx === currentIndex ? 'active' : ''}`}
-                >
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <h3 className="slide-title" style={{ margin: 0 }}>{m.title}</h3>
-                    <p className="slide-desc" style={{ margin: '16px 0 0 0' }}>{m.desc}</p>
-                    
-                    <div className="slide-highlights" style={{ margin: '20px 0 0 0' }}>
-                      {m.highlights.map((h, i) => (
-                        <div className="slide-highlight-item" key={i}>
-                          <CheckCircle2 size={18} style={{ color: '#10B981' }} /> {h}
-                        </div>
-                      ))}
+              {/* Fixed Height Viewport for Slides to permanently lock button position */}
+              <div className="slider-slides-viewport">
+                {modules.map((m, idx) => (
+                  <div 
+                    key={m.id} 
+                    className={`slider-content-slide ${idx === currentIndex ? 'active' : ''}`}
+                  >
+                    <div className="slide-content-inner">
+                      <h3 className="slide-title">{m.title}</h3>
+                      <p className="slide-desc">{m.desc}</p>
+                      
+                      <div className="slide-highlights">
+                        {m.highlights.map((h, i) => (
+                          <div className="slide-highlight-item" key={i}>
+                            <CheckCircle2 size={18} style={{ color: '#10B981', flexShrink: 0 }} />
+                            <span>{h}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-
-                  <a href={`/course/${m.id}`} className="btn btn-primary slide-cta" style={{ marginTop: '86px' }} aria-label={`Explore ${m.id.split('-').join(' ')} module`}>
-                    Explore Module <ArrowRight size={16} />
-                  </a>
-                </div>
-              ))}
+                ))}
+              </div>
               
-              <div className="slider-navigation" style={{ paddingRight: '20px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
-                  <div className="slider-arrows">
-                    <button className="slider-arrow" onClick={handlePrev} aria-label="Previous Module">
-                      <ChevronLeft size={20} />
-                    </button>
-                    <button className="slider-arrow" onClick={handleNext} aria-label="Next Module">
-                      <ChevronRight size={20} />
-                    </button>
-                  </div>
-                  <div className="slider-dots" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '200px' }}>
-                    {modules.map((_, idx) => {
+              {/* Fixed Bottom Controls: Button + Navigation */}
+              <div className="slider-bottom-controls">
+                
+                <a href={`/course/${modules[currentIndex].id}`} className="btn btn-primary slide-cta" aria-label={`Explore ${modules[currentIndex].tabLabel} module`}>
+                  Explore Module <ArrowRight size={16} />
+                </a>
+
+                <div className="slider-navigation">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
+                    <div className="slider-arrows">
+                      <button className="slider-arrow" onClick={handlePrev} aria-label="Previous Module">
+                        <ChevronLeft size={20} />
+                      </button>
+                      <button className="slider-arrow" onClick={handleNext} aria-label="Next Module">
+                        <ChevronRight size={20} />
+                      </button>
+                    </div>
+                    <div className="slider-dots" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '200px' }}>
+                      {modules.map((_, idx) => {
                       const isActive = idx === currentIndex;
                       return (
                         <button 
@@ -468,6 +475,7 @@ export default function Syllabus() {
                 </div>
               </div>
             </div>
+            </div>
 
             {/* Right Image Area */}
             <div className="slider-media-wrapper">
@@ -482,7 +490,19 @@ export default function Syllabus() {
                     key={m.id} 
                     className={`slider-media-slide ${idx === currentIndex ? 'active' : ''}`}
                   >
-                    <img src={m.image} alt={m.title} loading={idx === 0 ? "eager" : "lazy"} decoding="async" />
+                    <img
+                      src={m.image}
+                      srcSet={m.image
+                        ? `${m.image.replace('.webp', '-300.webp')} 300w, ${m.image.replace('.webp', '-600.webp')} 600w, ${m.image} 800w`
+                        : undefined
+                      }
+                      sizes="(max-width: 768px) 300px, (max-width: 1200px) 600px, 800px"
+                      alt={m.title}
+                      width="800"
+                      height="519"
+                      loading={idx === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                    />
                   </div>
                 ))}
               </div>
@@ -490,7 +510,7 @@ export default function Syllabus() {
           </div>
         </div>
       </div>
-      {/* 📊 CLEAN MINIMALIST STATS SECTION */}
+      {/* ≡ƒôè CLEAN MINIMALIST STATS SECTION */}
       <div className="stats-clean-wrapper">
         <div className="stats-clean-container">
           

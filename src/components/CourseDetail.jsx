@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { 
   ArrowLeft, CheckCircle2, Play, BookOpen, Sliders, FileVideo, Mic, 
   Workflow, Folder, HardDrive, Video, Camera, Volume2, Palette, Sun, 
@@ -87,9 +88,9 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         { label: 'Module 9: Analytics & Reporting', icon: <Activity size={16} /> }
       ],
       salaryInsights: [
-        { experience: 'Fresher (0-2 Yrs)', salary: '\u20B92.5L - \u20B94.0L' },
-        { experience: 'Mid-Level (2-5 Yrs)', salary: '\u20B97.0L - \u20B912.0L' },
-        { experience: 'Senior (5+ Yrs)', salary: '\u20B915.0L - \u20B925.0L+' }
+        { experience: 'Fresher (0-2 Yrs)', salary: '₹2.5L - ₹4.0L' },
+        { experience: 'Mid-Level (2-5 Yrs)', salary: '₹7.0L - ₹12.0L' },
+        { experience: 'Senior (5+ Yrs)', salary: '₹15.0L - ₹25.0L+' }
       ],
       learningProcess: [
         { step: 1, title: 'Fundamentals', desc: 'Marketing basics & strategy' },
@@ -130,9 +131,9 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         { label: 'Module 15: Personal Branding', icon: <Star size={16} /> }
       ],
       salaryInsights: [
-        { experience: 'Fresher (0-2 Yrs)', salary: '\u20B92.5L - \u20B94.5L' },
-        { experience: 'Mid-Level (2-5 Yrs)', salary: '\u20B97.0L - \u20B913.0L' },
-        { experience: 'Manager (5+ Yrs)', salary: '\u20B916.0L - \u20B940.0L+' }
+        { experience: 'Fresher (0-2 Yrs)', salary: '₹2.5L - ₹4.5L' },
+        { experience: 'Mid-Level (2-5 Yrs)', salary: '₹7.0L - ₹13.0L' },
+        { experience: 'Manager (5+ Yrs)', salary: '₹16.0L - ₹40.0L+' }
       ],
       learningProcess: [
         { step: 1, title: 'Basics & Content', desc: 'Copywriting & organic strategy' },
@@ -180,10 +181,10 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         { label: 'Module 22: Packaging & Product Design', icon: <Folder size={16} /> }
       ],
       salaryInsights: [
-        { experience: 'Fresher (0-1 Yr)', salary: '\u20B93.0L - \u20B95.0L' },
-        { experience: 'Junior (1-3 Yrs)', salary: '\u20B95.0L - \u20B99.0L' },
-        { experience: 'Mid-Level (3-5 Yrs)', salary: '\u20B99.0L - \u20B916.0L' },
-        { experience: 'Senior (5+ Yrs)', salary: '\u20B916.0L - \u20B928.0L+' }
+        { experience: 'Fresher (0-1 Yr)', salary: '₹3.0L - ₹5.0L' },
+        { experience: 'Junior (1-3 Yrs)', salary: '₹5.0L - ₹9.0L' },
+        { experience: 'Mid-Level (3-5 Yrs)', salary: '₹9.0L - ₹16.0L' },
+        { experience: 'Senior (5+ Yrs)', salary: '₹16.0L - ₹28.0L+' }
       ],
       learningProcess: [
         { step: 1, title: 'Design Principles', desc: 'Color, typography, layout' },
@@ -219,10 +220,10 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         { label: 'Module 10: AI Tools for Graphic Design', icon: <Sparkles size={16} /> }
       ],
       salaryInsights: [
-        { experience: 'Fresher', salary: '\u20B92.0L - \u20B93.5L' },
-        { experience: '1-3 Years', salary: '\u20B93.5L - \u20B96.0L' },
-        { experience: '3-5 Years', salary: '\u20B96.0L - \u20B910.0L' },
-        { experience: 'Senior', salary: '\u20B910.0L - \u20B918.0L+' }
+        { experience: 'Fresher', salary: '₹2.0L - ₹3.5L' },
+        { experience: '1-3 Years', salary: '₹3.5L - ₹6.0L' },
+        { experience: '3-5 Years', salary: '₹6.0L - ₹10.0L' },
+        { experience: 'Senior', salary: '₹10.0L - ₹18.0L+' }
       ],
       learningProcess: [
         { step: 1, title: 'Fundamentals', desc: 'Design theory & elements' },
@@ -256,9 +257,9 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         { label: 'Module 8: Freelancing & Agency Work', icon: <Target size={16} /> }
       ],
       salaryInsights: [
-        { experience: 'Fresher', salary: '\u20B93.5L - \u20B96.0L' },
-        { experience: '1-3 Years', salary: '\u20B96.0L - \u20B912.0L' },
-        { experience: 'Senior', salary: '\u20B915.0L - \u20B925.0L+' }
+        { experience: 'Fresher', salary: '₹3.5L - ₹6.0L' },
+        { experience: '1-3 Years', salary: '₹6.0L - ₹12.0L' },
+        { experience: 'Senior', salary: '₹15.0L - ₹25.0L+' }
       ],
       learningProcess: [
         { step: 1, title: 'Graphic Design', desc: 'Master Photoshop & Illustrator' },
@@ -294,10 +295,10 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         { label: 'Module 10: AI-Powered Full Stack Development', icon: <Brain size={16} /> }
       ],
       salaryInsights: [
-        { experience: 'Fresher', salary: '\u20B93.5L - \u20B96.0L' },
-        { experience: '1-3 Years', salary: '\u20B96.0L - \u20B912.0L' },
-        { experience: '3-5 Years', salary: '\u20B912.0L - \u20B920.0L' },
-        { experience: 'Senior', salary: '\u20B920.0L - \u20B935.0L+' }
+        { experience: 'Fresher', salary: '₹3.5L - ₹6.0L' },
+        { experience: '1-3 Years', salary: '₹6.0L - ₹12.0L' },
+        { experience: '3-5 Years', salary: '₹12.0L - ₹20.0L' },
+        { experience: 'Senior', salary: '₹20.0L - ₹35.0L+' }
       ],
       learningProcess: [
         { step: 1, title: 'Front-end Basics', desc: 'HTML, CSS, JavaScript' },
@@ -333,10 +334,10 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         { label: 'Module 10: App Testing & Deployment', icon: <Target size={16} /> }
       ],
       salaryInsights: [
-        { experience: 'Fresher', salary: '\u20B94.0L - \u20B97.0L' },
-        { experience: '1-3 Years', salary: '\u20B97.0L - \u20B914.0L' },
-        { experience: '3-5 Years', salary: '\u20B914.0L - \u20B922.0L' },
-        { experience: 'Senior', salary: '\u20B922.0L - \u20B940.0L+' }
+        { experience: 'Fresher', salary: '₹4.0L - ₹7.0L' },
+        { experience: '1-3 Years', salary: '₹7.0L - ₹14.0L' },
+        { experience: '3-5 Years', salary: '₹14.0L - ₹22.0L' },
+        { experience: 'Senior', salary: '₹22.0L - ₹40.0L+' }
       ],
       learningProcess: [
         { step: 1, title: 'UI Fundamentals', desc: 'Mobile UI concepts' },
@@ -373,9 +374,9 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         { label: 'Module 11: Exporting & Client Delivery', icon: <Folder size={16} /> }
       ],
       salaryInsights: [
-        { experience: 'Fresher', salary: '\u20B92.5L - \u20B94.0L' },
-        { experience: '1-3 Years', salary: '\u20B94.0L - \u20B97.0L' },
-        { experience: 'Senior', salary: '\u20B98.0L - \u20B915.0L+' }
+        { experience: 'Fresher', salary: '₹2.5L - ₹4.0L' },
+        { experience: '1-3 Years', salary: '₹4.0L - ₹7.0L' },
+        { experience: 'Senior', salary: '₹8.0L - ₹15.0L+' }
       ],
       learningProcess: [
         { step: 1, title: 'Fundamentals', desc: 'Storytelling & timeline' },
@@ -414,10 +415,10 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         { label: 'Module 13: Exporting, Delivery & Broadcast Standards', icon: <Folder size={16} /> }
       ],
       salaryInsights: [
-        { experience: 'Fresher', salary: '\u20B93.0L - \u20B95.0L' },
-        { experience: '1-3 Years', salary: '\u20B95.0L - \u20B99.0L' },
-        { experience: '3-5 Years', salary: '\u20B99.0L - \u20B916.0L' },
-        { experience: 'Senior', salary: '\u20B916.0L - \u20B925.0L+' }
+        { experience: 'Fresher', salary: '₹3.0L - ₹5.0L' },
+        { experience: '1-3 Years', salary: '₹5.0L - ₹9.0L' },
+        { experience: '3-5 Years', salary: '₹9.0L - ₹16.0L' },
+        { experience: 'Senior', salary: '₹16.0L - ₹25.0L+' }
       ],
       learningProcess: [
         { step: 1, title: 'After Effects Basics', desc: 'Keyframes & layers' },
@@ -438,8 +439,8 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
     {
       id: 'adv-gen-ai',
       title: 'Advanced Certification in Gen AI',
-      image: '/genai&agenai.webp',
-      desc: 'Master Generative AI, Large Language Models (LLMs), RAG, AI Agents, LangChain, LangGraph, CrewAI, MCP, Fine-Tuning, and production-ready AI application development through hands-on projects and real-world engineering practices.',
+      image: '/genai_and_agenai.webp',
+      desc: 'Master Generative AI, LLMs, RAG, and AI Agents to build production-ready applications through hands-on real-world engineering projects.',
       topics: [
         { label: 'Introduction to Generative AI', icon: <Sparkles size={16} /> },
         { label: 'Prompt Engineering', icon: <Type size={16} /> },
@@ -476,10 +477,10 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         'Week 10 - MCP, Deployment & Capstone Project'
       ],
       salaryInsights: [
-        { experience: 'Fresher (0-2 Yrs)', salary: '\u20B96.0L - \u20B910.0L' },
-        { experience: 'Mid-Level (2-5 Yrs)', salary: '\u20B910.0L - \u20B918.0L' },
-        { experience: 'Senior (5+ Yrs)', salary: '\u20B918.0L - \u20B930.0L+' },
-        { experience: 'Lead AI Engineer', salary: '\u20B930.0L - \u20B950.0L+' }
+        { experience: 'Fresher (0-2 Yrs)', salary: '₹6.0L - ₹10.0L' },
+        { experience: 'Mid-Level (2-5 Yrs)', salary: '₹10.0L - ₹18.0L' },
+        { experience: 'Senior (5+ Yrs)', salary: '₹18.0L - ₹30.0L+' },
+        { experience: 'Lead AI Engineer', salary: '₹30.0L - ₹50.0L+' }
       ],
       learningProcess: [
         { step: 1, title: 'LLM Fundamentals', desc: 'APIs, prompt engineering & local models' },
@@ -515,6 +516,15 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
 
   return (
     <div className="course-detail-page">
+      <Helmet>
+        <title>{module ? `${module.title.replace(/\n/g, ' ')} | Nextal Academy Nagercoil` : 'Course | Nextal Academy'}</title>
+        <meta name="description" content={module ? module.desc : 'Explore our job-oriented courses at Nextal Academy Nagercoil.'} />
+        <link rel="canonical" href={`https://nextalacademy.in/course/${slug}`} />
+        <meta property="og:title" content={module ? `${module.title.replace(/\n/g, ' ')} | Nextal Academy` : 'Course | Nextal Academy'} />
+        <meta property="og:description" content={module ? module.desc : ''} />
+        <meta property="og:url" content={`https://nextalacademy.in/course/${slug}`} />
+        <meta property="og:image" content={module?.image ? `https://nextalacademy.in${module.image}` : 'https://nextalacademy.in/academy_logo.webp'} />
+      </Helmet>
       <style>
         {`
           @keyframes meshBreathing {
@@ -618,10 +628,20 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
             </button>
           </div>
           <div className="course-detail-media" style={{ boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
-            <picture>
-              <source media="(max-width: 768px)" srcSet={`${module.image}?w=480`} />
-              <img src={module.image} alt={module.title} width="600" height="400" style={{ width: '100%', height: 'auto', aspectRatio: '3/2', objectFit: 'cover' }} fetchpriority="high" decoding="async" />
-            </picture>
+            <img
+              src={module.image}
+              srcSet={module.image
+                ? `${module.image.replace('.webp', '-300.webp')} 300w, ${module.image.replace('.webp', '-600.webp')} 600w, ${module.image} 800w`
+                : undefined
+              }
+              sizes="(max-width: 768px) 300px, (max-width: 1200px) 600px, 800px"
+              alt={module.title}
+              width="800"
+              height="519"
+              style={{ width: '100%', height: 'auto', aspectRatio: '3/2', objectFit: 'cover' }}
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         </div>
 
@@ -723,7 +743,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
 
         {/* What You'll Walk Away With Section */}
         <div className="walk-away-section anim-card delay-2 stagger-container">
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div style={{ textAlign: 'left', marginBottom: '2rem' }}>
             <h2 className="premium-heading" style={{ fontSize: '2rem' }}>What You'll Walk Away With</h2>
           </div>
           

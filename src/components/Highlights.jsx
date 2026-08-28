@@ -49,15 +49,21 @@ export default function Highlights() {
         // Dynamically calculate node size based on CSS breakpoints to ensure nodes don't overflow
         const nodeSize = window.innerWidth > 480 ? Math.min(200, window.innerWidth * 0.16) : 130;
         
-        // Calculate safe diameter: Container width minus node size and some padding
-        const safeDiameter = Math.max(w - nodeSize - 20, 240); 
-        
-        // Optional: on very large screens, we can still cap or scale the radius
-        radius = window.innerWidth > 1024 ? Math.max(w * 0.7, 700) / 2 : safeDiameter / 2;
+        // Calculate safe diameter for desktop, but force massive radius on mobile/tablet to spread nodes
+        let calculatedRadius;
+        if (window.innerWidth > 1024) {
+          calculatedRadius = Math.max(w * 0.7, 700) / 2;
+        } else if (window.innerWidth > 768) {
+          calculatedRadius = Math.max(w * 1.5, 650) / 2;
+        } else {
+          // Mobile: Force massive radius to flatten curve and prevent overlap with central ring
+          calculatedRadius = Math.max(w * 3.2, 1200) / 2; 
+        }
+        radius = calculatedRadius;
         
         centerX = w / 2;
         // Push center down so the full ring sits inside the wrapper
-        // On smaller screens, we don't need as much vertical offset
+        // Since radius is massive on mobile, vertical offset keeps the top of the arc in view
         const verticalOffset = window.innerWidth > 768 ? 175 : 120;
         centerY = radius + verticalOffset;
 
@@ -137,12 +143,12 @@ export default function Highlights() {
         for(let i = 1; i <= carouselItems.length; i++) {
            tlRef.current.to(proxyRef.current, {
              rotation: i * -ANGLE_SPACING,
-             duration: 0.8,
+             duration: 0.4,
              ease: 'power2.inOut',
              onUpdate: () => {
                updateNodes(proxyRef.current.rotation);
              }
-           }, `+=${1.4}`); // 1.4s hold time
+           }, `+=${0.6}`); // 0.6s hold time
         }
       };
 

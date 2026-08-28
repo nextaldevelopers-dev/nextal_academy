@@ -78,10 +78,10 @@ export default function Hero({ onOpenEnrollModal }) {
         <div className="hero-grid">
           <div className="hero-content">
 
-            <h1 className="hero-title anim-text delay-2" style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>
-              Master <span className="accent">Creative AI</span>
+            <h1 className="hero-title lcp-element anim-text" style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>
+              Master <span className="accent">Creative AI</span> &amp;
               <br />
-              & Build Your Future
+              Build Your Future
             </h1>
 
             <div className="hero-evolution-steps anim-text delay-3" style={{ 
@@ -110,7 +110,7 @@ export default function Hero({ onOpenEnrollModal }) {
               <span style={{ fontSize: '1.2em', fontWeight: '900', letterSpacing: '0.15em' }}>BECOME</span>
             </div>
 
-            <p className="hero-subtitle anim-text delay-4" style={{ maxWidth: '600px', color: '#d3d3d3' }}>
+            <p className="hero-subtitle lcp-element anim-text" style={{ maxWidth: '600px', color: '#d3d3d3' }}>
               Premium Job-Oriented Academy in Nagercoil. Master Video Editing, Motion Graphics, Full Stack Development, and Advanced Generative AI to launch your dream career.
             </p>
 

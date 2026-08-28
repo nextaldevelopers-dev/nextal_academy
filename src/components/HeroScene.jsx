@@ -29,7 +29,12 @@ class CanvasErrorBoundary extends React.Component {
 export default function HeroScene({ isMobile }) {
   return (
     <CanvasErrorBoundary>
-      <Canvas camera={{ position: [0, 1.5, 9.5], fov: 42 }} style={{ width: '100%', height: '100%', cursor: 'grab', overflow: 'visible' }}>
+      <Canvas
+        camera={{ position: [0, 1.5, 9.5], fov: 42 }}
+        dpr={Math.min(window.devicePixelRatio, 2)}
+        performance={{ min: 0.5 }}
+        style={{ width: '100%', height: '100%', cursor: 'grab', overflow: 'visible' }}
+      >
         <ambientLight intensity={0.7} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
         <spotLight position={[-5, 5, -5]} intensity={4} color="#ffffff" />

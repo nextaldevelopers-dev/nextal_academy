@@ -26,7 +26,6 @@ export default function WhyUs({ onSelectService }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
   const [introStarted, setIntroStarted] = useState(false);
   const [quoteIdx, setQuoteIdx] = useState(0);
-  const [quoteVisible, setQuoteVisible] = useState(true);
 
   const whyusSectionRef = useRef(null);
   const containerRef = useRef(null);
@@ -101,15 +100,10 @@ export default function WhyUs({ onSelectService }) {
   }, [introStarted]);
 
   // Headline quote cycling with fade animation
+  // Headline quote cycling with continuous crossfade
   useEffect(() => {
     const cycleInterval = setInterval(() => {
-      // Fade out
-      setQuoteVisible(false);
-      // After fade-out, switch quote and fade back in
-      setTimeout(() => {
-        setQuoteIdx((prev) => (prev + 1) % headlines.length);
-        setQuoteVisible(true);
-      }, 450);
+      setQuoteIdx((prev) => (prev + 1) % headlines.length);
     }, 3500);
 
     return () => clearInterval(cycleInterval);
@@ -329,24 +323,57 @@ export default function WhyUs({ onSelectService }) {
     });
   };
 
-  const TextBlock = ({ color }) => (
-    <div className="text-center mx-auto anim-text delay-2" style={{ marginBottom: '10rem' }}>
-        <h2
-          className={`section-title`}
-          style={{
-            display: 'inline-block',
-            fontSize: '3.5rem',
-            lineHeight: '1.2',
-            color: '#000000',
-            opacity: quoteVisible ? 1 : 0,
-            transform: quoteVisible ? 'translateY(0)' : 'translateY(-20px)',
-            transition: 'opacity 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
-          }}
-        >
-        {headlines[quoteIdx].title}<br/>{headlines[quoteIdx].sub}
-      </h2>
-    </div>
-  );
+  const TextBlock = () => {
+    return (
+      <div
+        className="text-center mx-auto why-us-heading-viewport anim-text delay-2"
+        style={{
+          marginBottom: '10rem',
+          position: 'relative',
+          height: '12rem',
+          overflow: 'hidden',
+        }}
+      >
+        {headlines.map((item, idx) => {
+          const isActive = idx === quoteIdx;
+          const isPrev = idx === (quoteIdx - 1 + headlines.length) % headlines.length;
+
+          // Active: slide to center. Prev: slide out above. Others: hidden below (invisible).
+          let translateY = '110%';
+          if (isActive) translateY = '0%';
+          else if (isPrev) translateY = '-110%';
+
+          return (
+            <div
+              key={idx}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                // Only active and prev are visible — others are truly hidden
+                visibility: (isActive || isPrev) ? 'visible' : 'hidden',
+                transform: `translateY(${translateY})`,
+                // Only transition when sliding in (active) or sliding out (prev)
+                transition: (isActive || isPrev)
+                  ? 'transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s'
+                  : 'none',
+              }}
+            >
+              <h2
+                className="section-title"
+                style={{ margin: 0, fontSize: '3.5rem', lineHeight: '1.2' }}
+              >
+                {item.title}<br />{item.sub}
+              </h2>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
 
   return (
     <section id="why-us" className="section why-us-interactive-section" ref={whyusSectionRef} style={{ position: 'relative', backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -362,7 +389,7 @@ export default function WhyUs({ onSelectService }) {
         
         {/* Base Text Wrapper */}
         <div style={{ position: 'relative', zIndex: 2 }}>
-          <TextBlock color="#000000" />
+          {TextBlock()}
         </div>
 
         {/* Circular Orbit Carousel Container */}

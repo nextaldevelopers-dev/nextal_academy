@@ -56,12 +56,23 @@ export default function Header({ onOpenEnrollModal }) {
   }, []);
 
   const closeNav = () => {
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setMobileNavOpen(false);
-    setTimeout(() => {
-      setMobileDropdownOpen(false);
-      setMobileSubDropdownOpen(null);
-    }, 300);
+    setMobileDropdownOpen(false);
+    setMobileSubDropdownOpen(null);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && mobileNavOpen) {
+        closeNav();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileNavOpen]);
 
   return (
     <header className={`site-header${scrolled ? ' scrolled' : ''}${isHidden ? ' hidden' : ''}`}>
@@ -70,7 +81,16 @@ export default function Header({ onOpenEnrollModal }) {
 
           {/* Brand Logo */}
           <a href="#home" className="brand-logo">
-            <img src="/academy_logo.webp" alt="Nextal Academy" width="200" height="50" style={{ height: '150px', width: 'auto', objectFit: 'contain' }} fetchpriority="high" decoding="async" />
+            <img
+                src="/academy_logo-150.webp"
+                srcSet="/academy_logo-150.webp 1x, /academy_logo-300.webp 2x"
+                alt="Nextal Academy"
+                width="150"
+                height="150"
+                style={{ height: '150px', width: 'auto', objectFit: 'contain' }}
+                fetchpriority="high"
+                decoding="async"
+              />
           </a>
 
           {/* Navigation */}
@@ -79,13 +99,11 @@ export default function Header({ onOpenEnrollModal }) {
             <a href="#why-us"  className="nav-link" onClick={closeNav}>Why Us</a>
 
             <div className={`nav-dropdown ${mobileDropdownOpen ? 'mobile-open' : ''}`}>
-              <a href="#syllabus" className="nav-link dropdown-toggle" onClick={(e) => {
+              <a href="#" className="nav-link dropdown-toggle" onClick={(e) => {
+                e.preventDefault();
                 if (window.innerWidth < 1024) {
-                  e.preventDefault();
                   e.stopPropagation();
                   setMobileDropdownOpen(!mobileDropdownOpen);
-                } else {
-                  closeNav();
                 }
               }}>
                 Lectures <ChevronDown size={14} style={{ marginLeft: '4px', transform: mobileDropdownOpen && window.innerWidth < 1024 ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }} />

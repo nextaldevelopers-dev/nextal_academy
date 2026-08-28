@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Suspense } from 'react';
+import { Helmet } from 'react-helmet-async';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import useFPSMonitor from './hooks/useFPSMonitor';
@@ -80,23 +81,34 @@ export default function App() {
   }, [initialLoading]);
 
   useEffect(() => {
-    let timeoutMs = 800; // Standard connection
+    // Determine min display time based on network
+    let minDisplayTime = 800; // Standard minimum
     if (navigator.connection) {
       const { effectiveType, downlink } = navigator.connection;
       if (effectiveType === 'slow-2g' || effectiveType === '2g' || effectiveType === '3g' || downlink < 1.5) {
-        timeoutMs = 2500;
-        document.documentElement.setAttribute('data-low-performance', 'true'); // Pre-emptive low-perf mode for slow nets
+        minDisplayTime = 1500;
+        document.documentElement.setAttribute('data-low-performance', 'true');
       }
     }
 
-    const fadeTimer = setTimeout(() => {
-      setIsFadingOut(true);
-      setTimeout(() => setInitialLoading(false), 600); // 600ms fade transition
-    }, timeoutMs);
+    // Promise 1: Minimum display time
+    const minTimePromise = new Promise(resolve => setTimeout(resolve, minDisplayTime));
 
-    return () => {
-      clearTimeout(fadeTimer);
-    };
+    // Promise 2: Actual page load (if already loaded, resolves immediately)
+    const loadPromise = new Promise(resolve => {
+      if (document.readyState === 'complete') {
+        resolve();
+      } else {
+        window.addEventListener('load', resolve, { once: true });
+      }
+    });
+
+    // When both are met, fade out the loader
+    Promise.all([minTimePromise, loadPromise]).then(() => {
+      setIsFadingOut(true);
+      setTimeout(() => setInitialLoading(false), 700); // Wait for the 0.7s CSS transition to finish
+    });
+
   }, []);
 
   useEffect(() => {
@@ -264,6 +276,18 @@ export default function App() {
 
   return (
     <div className="app">
+      <Helmet>
+        <title>Nextal Academy Nagercoil | Video Editing, AI & Design Courses</title>
+        <meta name="description" content="Master Video Editing, AI, and UI/UX Design at Nextal Academy Nagercoil. Get job-ready with our 100% placement-focused courses and hands-on portfolio building." />
+        <link rel="canonical" href="https://nextalacademy.com" />
+        <meta property="og:title" content="Nextal Academy Nagercoil | Video Editing, AI & Design Courses" />
+        <meta property="og:description" content="Master Video Editing, AI, and UI/UX Design at Nextal Academy Nagercoil. 100% placement assistance." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://nextalacademy.com" />
+        <meta property="og:image" content="https://nextalacademy.com/academy_logo.webp" />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Helmet>
+      
       <Header onOpenEnrollModal={() => setModalOpen(true)} />
 
       <Suspense fallback={<PageFallback />}>

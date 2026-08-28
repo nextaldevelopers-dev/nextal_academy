@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, CheckCircle2, Calendar, ShieldCheck, Sparkles, Send } from 'lucide-react';
 
 const serviceDetails = {
@@ -151,6 +152,14 @@ export default function ServiceDetail({ slug, onBack, onOpenEnrollModal }) {
 
   return (
     <section key={slug} className="service-detail-section" style={{ paddingBlock: 'var(--section-spacing-md)', background: '#ffffff' }}>
+      <Helmet>
+        <title>{service.title} | Nextal Academy Nagercoil</title>
+        <meta name="description" content={service.desc} />
+        <link rel="canonical" href={`https://nextalacademy.in/service/${slug}`} />
+        <meta property="og:title" content={`${service.title} | Nextal Academy`} />
+        <meta property="og:description" content={service.desc} />
+        <meta property="og:url" content={`https://nextalacademy.in/service/${slug}`} />
+      </Helmet>
       <div className="container">
         {/* Back Button */}
         <button onClick={onBack} className="service-detail-back-btn anim-button delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', color: 'var(--accent-coral)', fontWeight: '600', cursor: 'pointer', marginBottom: '2.5rem', padding: '0', fontSize: '1rem' }}>
@@ -184,7 +193,7 @@ export default function ServiceDetail({ slug, onBack, onOpenEnrollModal }) {
                 ].map((benefit, idx) => (
                   <div key={idx} className="curriculum-item" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', paddingBottom: '1rem', borderBottom: idx < 5 ? '1px solid var(--border-light)' : 'none' }}>
                     <div style={{ width: '8px', height: '8px', background: 'var(--accent-coral)', borderRadius: '50%', marginTop: '8px', flexShrink: 0 }} />
-                    <span style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--text-primary)' }}>{benefit}</span>
+                    <span style={{ fontSize: '1rem', fontWeight: '600', color: '#000000' }}>{benefit}</span>
                   </div>
                 ))}
               </div>
@@ -192,51 +201,85 @@ export default function ServiceDetail({ slug, onBack, onOpenEnrollModal }) {
           </div>
 
           {/* Sidebar Info */}
-          <div className="service-detail-sidebar anim-card delay-3" style={{ display: 'flex', flexDirection: 'column', position: 'sticky', top: '100px', background: 'linear-gradient(135deg, #5E086B 0%, #220066 100%)', borderRadius: 'var(--radius-lg)', padding: '2.5rem', color: 'var(--text-white)', boxShadow: 'var(--shadow-lg)' }}>
-            <h3 style={{ fontSize: '1.5rem', color: 'var(--text-white)', fontWeight: '700', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Sparkles size={20} className="text-accent" style={{ color: 'var(--accent-coral)' }} /> Course Details
-            </h3>
-
-            <div className="sidebar-meta-list" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
-              <div className="sidebar-meta-item" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <Calendar size={20} style={{ color: 'var(--accent-coral)', flexShrink: 0 }} />
-                <div>
-                  <h5 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>Duration</h5>
-                  <p style={{ fontSize: '1rem', fontWeight: '600', margin: 0, color: 'var(--text-white)' }}>{service.duration}</p>
-                </div>
-              </div>
-
-              <div className="sidebar-meta-item" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <ShieldCheck size={20} style={{ color: 'var(--accent-coral)', flexShrink: 0 }} />
-                <div>
-                  <h5 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>Certification</h5>
-                  <p style={{ fontSize: '1rem', fontWeight: '600', margin: 0, color: 'var(--text-white)' }}>Nextal Academy Certified</p>
-                </div>
-              </div>
+          <div 
+            className="service-detail-sidebar anim-card delay-3 interactive-sidebar" 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              position: 'sticky', 
+              top: '100px', 
+              borderRadius: 'var(--radius-lg)', 
+              padding: '2.5rem', 
+              color: 'var(--text-white)', 
+              boxShadow: 'var(--shadow-lg)',
+              overflow: 'hidden',
+              background: 'rgba(45, 5, 60, 0.85)', // Darker base for better text contrast
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+              e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+            }}
+          >
+            {/* Animated Background Blobs */}
+            <div className="sidebar-blob blob-1"></div>
+            <div className="sidebar-blob blob-2"></div>
+            
+            {/* Cursor Spotlight with Text */}
+            <div className="sidebar-spotlight">
+              <span className="spotlight-follow-text">NEXTAL ACADEMY</span>
             </div>
 
-            <div className="sidebar-outcomes">
-              <h4 style={{ fontSize: '1.1rem', color: 'var(--text-white)', fontWeight: '700', marginBottom: '1rem' }}>Key Learning Outcomes</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2.5rem' }}>
-                {service.outcomes.map((outcome, idx) => (
-                  <div key={idx} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                    <CheckCircle2 size={16} style={{ color: 'var(--accent-coral)', flexShrink: 0, marginTop: '3px' }} />
-                    <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)', lineHeight: '1.4' }}>{outcome}</span>
+            {/* Content Container (z-index above blobs) */}
+            <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <h3 style={{ fontSize: '1.5rem', color: 'var(--text-white)', fontWeight: '700', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Sparkles size={20} className="text-accent" style={{ color: 'var(--accent-coral)' }} /> Course Details
+              </h3>
+
+              <div className="sidebar-meta-list" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                <div className="sidebar-meta-item anim-slide-up" style={{ display: 'flex', gap: '1rem', alignItems: 'center', animationDelay: '0.4s' }}>
+                  <Calendar size={20} style={{ color: 'var(--accent-coral)', flexShrink: 0 }} />
+                  <div>
+                    <h5 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>Duration</h5>
+                    <p style={{ fontSize: '1rem', fontWeight: '600', margin: 0, color: 'var(--text-white)' }}>{service.duration}</p>
                   </div>
-                ))}
+                </div>
+
+                <div className="sidebar-meta-item anim-slide-up" style={{ display: 'flex', gap: '1rem', alignItems: 'center', animationDelay: '0.5s' }}>
+                  <ShieldCheck size={20} style={{ color: 'var(--accent-coral)', flexShrink: 0 }} />
+                  <div>
+                    <h5 style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>Certification</h5>
+                    <p style={{ fontSize: '1rem', fontWeight: '600', margin: 0, color: 'var(--text-white)' }}>Nextal Academy Certified</p>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div style={{ marginTop: 'auto', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.06)', padding: '1.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <h4 style={{ fontSize: '1.1rem', color: 'var(--text-white)', fontWeight: '700', marginBottom: '0.5rem' }}>Ready to Start?</h4>
-              <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)', lineHeight: '1.5', margin: 0 }}>
-                Join our intensive program to build yourself into what you want to become, gain hands-on experience, and secure your creative career with industry-leading mentors.
-              </p>
-            </div>
+              <div className="sidebar-outcomes">
+                <h4 style={{ fontSize: '1.1rem', color: 'var(--text-white)', fontWeight: '700', marginBottom: '1rem' }}>Key Learning Outcomes</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2.5rem' }}>
+                  {service.outcomes.map((outcome, idx) => (
+                    <div className="outcome-item anim-slide-up" key={idx} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', animationDelay: `${0.6 + (idx * 0.1)}s` }}>
+                      <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0, marginTop: '3px' }} />
+                      <span style={{ fontSize: '0.95rem', color: '#ffffff', lineHeight: '1.4' }}>{outcome}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-            <button onClick={onOpenEnrollModal} className="btn btn-primary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '0.5rem', background: 'var(--accent-coral)', color: 'var(--text-white)', border: 'none', borderRadius: 'var(--radius-sm)', padding: '0.9rem 1.5rem', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: '0 8px 16px rgba(246,36,119,0.3)' }}>
-              <Send size={16} /> Enroll in Course
-            </button>
+              <div className="anim-slide-up" style={{ marginTop: 'auto', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.06)', padding: '1.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.1)', animationDelay: '1.0s', backdropFilter: 'blur(10px)' }}>
+                <h4 style={{ fontSize: '1.1rem', color: 'var(--text-white)', fontWeight: '700', marginBottom: '0.5rem' }}>Ready to Start?</h4>
+                <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)', lineHeight: '1.5', margin: 0 }}>
+                  Join our intensive program to build yourself into what you want to become, gain hands-on experience, and secure your creative career with industry-leading mentors.
+                </p>
+              </div>
+
+              <button onClick={onOpenEnrollModal} className="btn btn-primary pulse-btn anim-slide-up" style={{ animationDelay: '1.2s', width: '100%', display: 'flex', justifyContent: 'center', gap: '0.5rem', background: 'var(--accent-coral)', color: 'var(--text-white)', border: 'none', borderRadius: 'var(--radius-sm)', padding: '0.9rem 1.5rem', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: '0 8px 16px rgba(246,36,119,0.3)' }}>
+                <Send size={16} /> Enroll in Course
+              </button>
+            </div>
           </div>
         </div>
       </div>

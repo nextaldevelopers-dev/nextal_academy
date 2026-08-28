@@ -10,7 +10,16 @@ export default function Footer() {
           {/* Brand */}
           <div className="footer-brand anim-image delay-1">
             <a href="#home" className="footer-logo">
-              <img src="/nextal white logo.png" alt="Nextal Academy" width="140" height="40" style={{ height: 'auto', width: '100%', maxWidth: '140px' }} loading="lazy" decoding="async" />
+              <img
+                src="/nextal-white-logo-140.webp"
+                srcSet="/nextal-white-logo-140.webp 1x, /nextal-white-logo-280.webp 2x"
+                alt="Nextal Academy"
+                width="140"
+                height="140"
+                style={{ height: 'auto', width: '100%', maxWidth: '140px' }}
+                loading="lazy"
+                decoding="async"
+              />
             </a>
             <p>
               Nagercoil's premier skill development institute providing
@@ -66,7 +75,7 @@ export default function Footer() {
             <div className="footer-contact-item">
               <MapPin size={18} />
               <a href="https://maps.google.com/maps?vet=10CAAQoqAOahcKEwj4iYCE566WAxUAAAAAHQAAAAAQBw..i&sca_esv=ed6da2d1bfbc369e&mstk=AUtExfBkC4aRU7ZywGLz57uZmi4W6UoXa6oqu49ZESuXeMrkxP4gn8GW2ZEUgV6rLyq1Xl34ny6qvGpGZCdGX_Dw1C97AzrhyteeoYKk1dl5boH8m6M4mT1O7YP1PMgl4-J9d4TGa5rTCgKejTX6Yt8dKT-jfq0CxlnItr3iyWTB19iVdWwWo8Z56h2mQXZ5YTj16w9K&pvq=Cg0vZy8xMXpoNHJkenB5gAEB&fvr=1&cs=1&um=1&ie=UTF-8&fb=1&gl=in&sa=X&ftid=0x3b04f96c0c22d09f:0xb380cd21e268d473" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Nextal Academy, Main Road, Nagercoil, Tamil Nadu – 629001
+                1st Floor, Chandrakala complex, 28-35/10, Azhagiyamandapam, Tamil Nadu 629168
               </a>
             </div>
             <div className="footer-contact-item">

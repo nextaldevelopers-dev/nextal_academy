@@ -28,16 +28,7 @@ export default function Faq() {
     }
   ];
 
-  // Auto-play accordion
-  useEffect(() => {
-    if (isPaused) return;
-    
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % faqs.length);
-    }, 4000); // Cycle every 4 seconds
-
-    return () => clearInterval(interval);
-  }, [isPaused, faqs.length]);
+  // Auto-play removed for better UX and to fix index misalignment on mobile
 
   return (
     <section id="faq" className="section" style={{ backgroundColor: '#ffffff' }}>
@@ -59,13 +50,33 @@ export default function Faq() {
             const isActive = activeIndex === idx;
             return (
               <div key={idx} className={`faq-card anim-card ${isActive ? 'active' : ''}`} style={{ '--card-index': idx + 3 }}>
-                <div className="faq-header" onClick={() => setActiveIndex(isActive ? -1 : idx)}>
+                <button 
+                  className="faq-header" 
+                  onClick={() => setActiveIndex(isActive ? -1 : idx)}
+                  aria-expanded={isActive}
+                  aria-controls={`faq-answer-${idx}`}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    color: 'inherit'
+                  }}
+                >
                   <span>{faq.q}</span>
                   <div className="faq-icon">
                     <ChevronDown size={18} />
                   </div>
-                </div>
-                <div className="faq-body">
+                </button>
+                <div 
+                  id={`faq-answer-${idx}`}
+                  className="faq-body"
+                >
                   {faq.a}
                 </div>
               </div>

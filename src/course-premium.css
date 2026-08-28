@@ -269,6 +269,7 @@
   padding: 2px;
   background: linear-gradient(135deg, rgba(246,36,119,0.5), rgba(34,0,102,0.5));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
@@ -464,6 +465,7 @@
 .salary-gradient-text {
   background: linear-gradient(135deg, #F62477, #5E086B);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 800;
   font-size: 1.8rem;
