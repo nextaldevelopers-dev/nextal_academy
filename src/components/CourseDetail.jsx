@@ -787,7 +787,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
           <div className="academy-content-inner">
             <div className="academy-content-text pill-container-wrapper" style={{ textAlign: 'center', maxWidth: '100%', margin: '0 auto', padding: '0 1rem' }}>
               <h2 className="text-reveal" style={{ color: 'white', marginBottom: '1.5rem', fontSize: '2.5rem', fontWeight: 600, WebkitTextFillColor: 'initial', background: 'none' }}>Why Choose Nextal Academy?</h2>
-              <p className="text-reveal" style={{ color: 'lightgrey', fontSize: '1.1rem', marginBottom: '3rem', lineHeight: '1.7', whiteSpace: 'nowrap', animationDelay: '0.1s' }}>
+              <p className="text-reveal" style={{ color: 'lightgrey', fontSize: '1.1rem', marginBottom: '3rem', lineHeight: '1.7', animationDelay: '0.1s' }}>
                 We believe the best way to learn is through practical experience. <br/>
                 Our industry-focused curriculum helps you master professional techniques while working on real projects.
               </p>
