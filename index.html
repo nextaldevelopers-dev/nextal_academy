@@ -114,13 +114,30 @@
     </script>
 
     <!-- Google tag (gtag.js) — Property 1 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5L8MRCN0N7"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
       gtag('config', 'G-5L8MRCN0N7');
+
+      // Load gtag.js after the first interaction or 5s after page load, so the ~150 KB
+      // analytics script doesn't compete with the page's first render. Calls made before
+      // it loads are queued in dataLayer and sent when it arrives.
+      (function () {
+        var loaded = false;
+        var evs = ['pointermove', 'pointerdown', 'touchstart', 'scroll', 'wheel', 'keydown'];
+        function loadGtag() {
+          if (loaded) return; loaded = true;
+          evs.forEach(function (e) { window.removeEventListener(e, loadGtag); });
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-5L8MRCN0N7';
+          document.head.appendChild(s);
+        }
+        evs.forEach(function (e) { window.addEventListener(e, loadGtag, { passive: true, once: true }); });
+        window.addEventListener('load', function () { setTimeout(loadGtag, 5000); });
+      })();
     </script>
 
     <!-- Google tag — Property 2 (uses the gtag.js already loaded above; loading it twice wastes ~170 KB) -->

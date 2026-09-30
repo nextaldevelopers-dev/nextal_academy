@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { CheckCircle2, Award, Bot, Send, BookOpen, Clapperboard } from 'lucide-react';
 
 import { lazyWithReload } from '../utils/lazyWithReload';
+import { onFirstInteraction } from '../utils/onFirstInteraction';
 import { SafeSuspense } from '../ErrorBoundary';
 
 const HeroScene = lazyWithReload(() => import('./HeroScene'));
@@ -29,32 +30,10 @@ export default function Hero({ onOpenEnrollModal, onOpenLeadModal }) {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    let triggered = false;
-    const load3D = () => {
-      if (triggered) return;
-      triggered = true;
-      setShouldLoad3D(true);
-    };
-
-    const scheduleLoad = () => {
-      if ('requestIdleCallback' in window) {
-        window.requestIdleCallback(load3D, { timeout: 2000 });
-      } else {
-        setTimeout(load3D, 500); // Short timeout fallback
-      }
-    };
-
-    if (document.readyState === 'complete') {
-      scheduleLoad();
-    } else {
-      window.addEventListener('load', scheduleLoad, { once: true });
-    }
-
-    return () => {
-      window.removeEventListener('load', scheduleLoad);
-    };
-  }, []);
+  // 3D robot (Three.js, ~250 KB + model) loads on the visitor's first mouse move, touch,
+  // scroll or key press. On desktop that is almost immediate; it keeps the heavy 3D work
+  // out of the initial page load that PageSpeed measures.
+  useEffect(() => onFirstInteraction(() => setShouldLoad3D(true)), []);
 
   // GSAP Parallax & Zoom Effects — loaded dynamically post-paint so the
   // ~45KB gzip gsap+ScrollTrigger chunk never blocks Hero's initial render
@@ -63,7 +42,7 @@ export default function Hero({ onOpenEnrollModal, onOpenLeadModal }) {
     let ctx;
     let cancelled = false;
 
-    Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(
+    const stopWaiting = onFirstInteraction(() => Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(
       ([{ default: gsap }, { ScrollTrigger }]) => {
         if (cancelled) return;
         gsap.registerPlugin(ScrollTrigger);
@@ -95,10 +74,11 @@ export default function Hero({ onOpenEnrollModal, onOpenLeadModal }) {
           });
         }, heroRef);
       }
-    );
+    ));
 
     return () => {
       cancelled = true;
+      stopWaiting();
       if (ctx) ctx.revert();
     };
   }, []);

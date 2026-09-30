@@ -101,7 +101,7 @@ export default function App() {
     //    below-fold components. This ensures below-fold CSS/JS chunks are
     //    never queued while the critical Hero render chain is in-flight.
     const schedulePostLoad = () => {
-      postLoadTimerId = setTimeout(trigger, 2500);
+      postLoadTimerId = setTimeout(trigger, 6000); // any scroll/touch loads them immediately
     };
 
     if (document.readyState === 'complete') {

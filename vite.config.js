@@ -52,7 +52,13 @@ export default defineConfig({
     // Disable automatic modulepreload injection for ALL chunks.
     // This prevents vendor-three (938KB) from being preloaded on every page.
     // The browser will still load chunks on demand via dynamic import().
-    modulePreload: false,
+    modulePreload: {
+      polyfill: false,
+      // Preload core chunks in parallel to shorten the request chain before the hero can render,
+      // but never the heavy extras that load later (3D, GSAP, below-fold sections).
+      resolveDependencies: (filename, deps) =>
+        deps.filter((d) => !/vendor-three|vendor-gsap|HeroScene|Robot_cat/.test(d)),
+    },
     // Raise chunk size warning limit slightly
     chunkSizeWarningLimit: 1000,
     // Minify with esbuild (default, very fast)
