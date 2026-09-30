@@ -40,3 +40,7 @@ UTF8
 # Large raw assets that shouldn't be in version control
 hero.png
 academy_logo.png
+
+lh/
+
+lh-live/

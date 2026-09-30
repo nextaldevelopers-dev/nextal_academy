@@ -117,4 +117,9 @@
   .sub-dropdown-toggle { display: flex; align-items: center; justify-content: space-between; padding-right: 0.75rem; }
 
 .mobile-toggle { display: none; background: none; border: none; color: var(--navy-deep); cursor: pointer; padding: 0.5rem; min-width: 44px; min-height: 44px; }
-
+
+/* Enroll button inside the mobile nav menu: hidden on desktop (responsive.css shows it inside the mobile menu) */
+.mobile-nav-enroll { display: none; }
+
+/* Restored from the 18 Sep build (lost when layout.css was reset): keep icons inside buttons from shrinking */
+.btn svg { flex-shrink: 0; width: 1.2em; height: 1.2em; }

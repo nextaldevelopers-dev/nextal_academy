@@ -8,7 +8,7 @@ export const blogs = [
     author: 'Nextal Academy',
     excerpt: 'AI agents are changing the precision, quickness and constant testing in digital marketing — from creating ad text to customizing campaigns and instantly optimizing bids.',
     metaDescription: 'Learn how AI agents automate digital marketing tasks like content creation, email, social media, SEO, paid ads, chatbots and analytics — plus the challenges and the future of AI in marketing.',
-    coverImage: '/img1.png',
+    coverImage: '/img1.webp',
     keywords: 'AI, Marketing Automation, AI Agents, Digital Marketing',
     faqs: [
       {
@@ -40,7 +40,7 @@ export const blogs = [
       },
       {
         type: 'image',
-        src: '/img2.png',
+        src: '/img2.webp',
         alt: 'AI workflow automation'
       },
       {
@@ -68,7 +68,7 @@ export const blogs = [
       },
       {
         type: 'image',
-        src: '/img3.png',
+        src: '/img3.webp',
         alt: 'AI content and copywriting'
       },
       {
@@ -81,7 +81,7 @@ export const blogs = [
       },
       {
         type: 'image',
-        src: '/img4.jpeg',
+        src: '/img4.webp',
         alt: 'Email automation'
       },
       {
@@ -94,7 +94,7 @@ export const blogs = [
       },
       {
         type: 'image',
-        src: '/img5.png',
+        src: '/img5.webp',
         alt: 'Social media management'
       },
       {
@@ -107,7 +107,7 @@ export const blogs = [
       },
       {
         type: 'image',
-        src: '/img6.png',
+        src: '/img6.webp',
         alt: 'SEO optimization'
       },
       {
@@ -120,7 +120,7 @@ export const blogs = [
       },
       {
         type: 'image',
-        src: '/img7.png',
+        src: '/img7.webp',
         alt: 'Paid advertising optimization'
       },
       {
@@ -133,7 +133,7 @@ export const blogs = [
       },
       {
         type: 'image',
-        src: '/img8.png',
+        src: '/img8.webp',
         alt: 'AI customer engagement'
       },
       {
@@ -154,7 +154,7 @@ export const blogs = [
       },
       {
         type: 'image',
-        src: '/img9.png',
+        src: '/img9.webp',
         alt: 'Marketing analytics'
       },
       {
@@ -181,7 +181,7 @@ export const blogs = [
       },
       {
         type: 'image',
-        src: '/img10.png',
+        src: '/img10.webp',
         alt: 'Human + AI collaboration'
       },
       {
@@ -217,7 +217,7 @@ export const blogs = [
     author: 'Nextal Academy',
     excerpt: 'Is your digital marketing actually delivering results? Learn the ROI formula, the key metrics behind it, and practical steps to measure marketing performance accurately.',
     metaDescription: 'Learn how to measure digital marketing ROI — the ROI formula, key marketing ROI metrics like ROAS, CAC, CLV, CPL and CTR, a step-by-step process, common mistakes and top tools.',
-    coverImage: '/img9.png', // TODO: replace with dedicated ROI image
+    coverImage: '/img9.webp', // TODO: replace with dedicated ROI image
     keywords: 'Digital Marketing ROI, ROI in digital marketing, marketing ROI metrics, Digital Marketing ROI Formula, return on ad spend, customer acquisition cost, customer lifetime value, CLV to CAC ratio, conversion rate formula, cost per lead, click-through rate, email marketing ROI',
     faqs: [
       {

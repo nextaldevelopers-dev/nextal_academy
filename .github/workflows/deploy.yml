@@ -43,9 +43,24 @@ jobs:
         run: sudo apt-get install -y sshpass
 
       # ── 7. Deploy via rsync with SSH password ────────────────────────────
+      # Old hashed build files are KEPT (not deleted) so visitors whose browser still has
+      # the previous page cached can load the files it asks for. Files older than 30 days
+      # are cleaned up at the end.
       - name: 🌐 Deploy via rsync
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" rsync -avz --delete \
+          # a) Upload new build files first, without deleting the old ones
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" rsync -avz \
+            -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
+            ./dist/assets/ \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/u838392794/public_html/assets/
+
+          # b) Upload everything else (index.html last-effective), removing stale non-asset files
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" rsync -avz --delete --exclude 'assets/' \
             -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
             ./dist/ \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/u838392794/public_html/
+
+          # c) Remove build files older than 30 days
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
+            "find /home/u838392794/public_html/assets -type f -mtime +30 -delete"

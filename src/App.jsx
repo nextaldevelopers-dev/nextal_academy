@@ -3,25 +3,27 @@ import { Helmet } from 'react-helmet-async';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import IntroLoader from './components/IntroLoader';
+import { lazyWithReload } from './utils/lazyWithReload';
+import { SafeSuspense } from './ErrorBoundary';
 
 
 // ── Lazy load below-fold & route-only components ──────────────────────────
-const WhyUs       = React.lazy(() => import('./components/WhyUs'));
-const Syllabus    = React.lazy(() => import('./components/Syllabus'));
-const Highlights  = React.lazy(() => import('./components/Highlights'));
-const Faq         = React.lazy(() => import('./components/Faq'));
-const CtaBanner   = React.lazy(() => import('./components/CtaBanner'));
-const Footer      = React.lazy(() => import('./components/Footer'));
-const EnrollModal = React.lazy(() => import('./components/EnrollModal'));
-const LeadMagnetModal = React.lazy(() => import('./components/LeadMagnetModal'));
-const ExitIntentModal = React.lazy(() => import('./components/ExitIntentModal'));
-const ServiceDetail = React.lazy(() => import('./components/ServiceDetail'));
-const CourseDetail  = React.lazy(() => import('./components/CourseDetail'));
-const Blogs         = React.lazy(() => import('./components/Blogs'));
-const BlogDetail    = React.lazy(() => import('./components/BlogDetail'));
-const Placement     = React.lazy(() => import('./components/Placement'));
-const ComingSoon    = React.lazy(() => import('./components/ComingSoon'));
-const BackToTop     = React.lazy(() => import('./components/BackToTop'));
+const WhyUs       = lazyWithReload(() => import('./components/WhyUs'));
+const Syllabus    = lazyWithReload(() => import('./components/Syllabus'));
+const Highlights  = lazyWithReload(() => import('./components/Highlights'));
+const Faq         = lazyWithReload(() => import('./components/Faq'));
+const CtaBanner   = lazyWithReload(() => import('./components/CtaBanner'));
+const Footer      = lazyWithReload(() => import('./components/Footer'));
+const EnrollModal = lazyWithReload(() => import('./components/EnrollModal'));
+const LeadMagnetModal = lazyWithReload(() => import('./components/LeadMagnetModal'));
+const ExitIntentModal = lazyWithReload(() => import('./components/ExitIntentModal'));
+const ServiceDetail = lazyWithReload(() => import('./components/ServiceDetail'));
+const CourseDetail  = lazyWithReload(() => import('./components/CourseDetail'));
+const Blogs         = lazyWithReload(() => import('./components/Blogs'));
+const BlogDetail    = lazyWithReload(() => import('./components/BlogDetail'));
+const Placement     = lazyWithReload(() => import('./components/Placement'));
+const ComingSoon    = lazyWithReload(() => import('./components/ComingSoon'));
+const BackToTop     = lazyWithReload(() => import('./components/BackToTop'));
 
 // Minimal lightweight route fallback
 const PageFallback = () => (
@@ -359,6 +361,19 @@ export default function App() {
 
       if (href.startsWith('#') && href.length > 1) {
         e.preventDefault();
+
+        // If the target section exists on the CURRENT page (e.g. a blog article's
+        // table of contents), scroll to it here instead of redirecting to the home page.
+        let localTarget = null;
+        try { localTarget = document.getElementById(decodeURIComponent(href.slice(1))); } catch (err) { localTarget = null; }
+        if (localTarget) {
+          if (window.lenis) {
+            window.lenis.scrollTo(localTarget, { offset: -100 });
+          } else {
+            localTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          return;
+        }
         
         const scrollToTarget = () => {
           let attempts = 0;
@@ -457,11 +472,12 @@ export default function App() {
       <Helmet>
         <title>Nextal Academy Nagercoil | Video Editing, AI & Design Courses</title>
         <meta name="description" content="Master Video Editing, AI, and UI/UX Design at Nextal Academy Nagercoil. Get job-ready with our 100% placement-focused courses and hands-on portfolio building." />
-        <link rel="canonical" href="https://nextalacademy.com" />
+        {/* Canonical follows the current page; pages with their own Helmet (blog, course) override it */}
+        <link rel="canonical" href={`https://nextalacademy.com${currentPath === '/' ? '/' : currentPath}`} />
         <meta property="og:title" content="Nextal Academy Nagercoil | Video Editing, AI & Design Courses" />
         <meta property="og:description" content="Master Video Editing, AI, and UI/UX Design at Nextal Academy Nagercoil. 100% placement assistance." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://nextalacademy.com" />
+        <meta property="og:url" content={`https://nextalacademy.com${currentPath === '/' ? '/' : currentPath}`} />
         <meta property="og:image" content="https://nextalacademy.com/academy_logo.webp" />
         <meta name="twitter:card" content="summary_large_image" />
       </Helmet>
@@ -469,67 +485,67 @@ export default function App() {
       <Header onOpenEnrollModal={() => setModalOpen(true)} />
 
       {isServiceRoute ? (
-        <Suspense fallback={<PageFallback />}>
+        <SafeSuspense fallback={<PageFallback />}>
           <ServiceDetail slug={serviceSlug} onBack={handleBackToHome} onOpenEnrollModal={() => setModalOpen(true)} />
-        </Suspense>
+        </SafeSuspense>
       ) : isCourseRoute ? (
-        <Suspense fallback={<PageFallback />}>
+        <SafeSuspense fallback={<PageFallback />}>
           <CourseDetail slug={courseSlug} onBack={handleBackToHome} onOpenEnrollModal={() => setModalOpen(true)} />
-        </Suspense>
+        </SafeSuspense>
       ) : isBlogsRoute ? (
-        <Suspense fallback={<PageFallback />}>
+        <SafeSuspense fallback={<PageFallback />}>
           <Blogs onBack={handleBackToHome} onOpenEnrollModal={() => setModalOpen(true)} />
-        </Suspense>
+        </SafeSuspense>
       ) : isBlogDetailRoute ? (
-        <Suspense fallback={<PageFallback />}>
+        <SafeSuspense fallback={<PageFallback />}>
           <BlogDetail slug={blogSlug} onBack={() => {
             window.history.pushState({}, '', '/blogs');
             window.dispatchEvent(new Event('popstate'));
           }} onOpenEnrollModal={() => setModalOpen(true)} />
-        </Suspense>
+        </SafeSuspense>
       ) : isPlacementRoute ? (
-        <Suspense fallback={<PageFallback />}>
+        <SafeSuspense fallback={<PageFallback />}>
           <Placement onBack={handleBackToHome} />
-        </Suspense>
+        </SafeSuspense>
       ) : isTermsRoute ? (
-        <Suspense fallback={<PageFallback />}>
+        <SafeSuspense fallback={<PageFallback />}>
           <ComingSoon title="Terms & Conditions" onBack={handleBackToHome} />
-        </Suspense>
+        </SafeSuspense>
       ) : isPrivacyRoute ? (
-        <Suspense fallback={<PageFallback />}>
+        <SafeSuspense fallback={<PageFallback />}>
           <ComingSoon title="Privacy Policy" onBack={handleBackToHome} />
-        </Suspense>
+        </SafeSuspense>
       ) : (
         <main>
           <Hero onOpenEnrollModal={() => setModalOpen(true)} onOpenLeadModal={() => setLeadModalOpen(true)} />
           {belowFoldStage >= 1 && (
-            <Suspense fallback={null}>
+            <SafeSuspense fallback={null}>
               <WhyUs onSelectService={handleSelectService} />
               <Syllabus onOpenLeadModal={() => setLeadModalOpen(true)} />
-            </Suspense>
+            </SafeSuspense>
           )}
           {belowFoldStage >= 2 && (
-            <Suspense fallback={null}>
+            <SafeSuspense fallback={null}>
               <Highlights />
               <Faq />
-            </Suspense>
+            </SafeSuspense>
           )}
           {belowFoldStage >= 3 && (
-            <Suspense fallback={null}>
+            <SafeSuspense fallback={null}>
               <CtaBanner onOpenEnrollModal={() => setModalOpen(true)} />
-            </Suspense>
+            </SafeSuspense>
           )}
         </main>
       )}
 
       {belowFoldStage >= 3 && (
-        <Suspense fallback={null}>
+        <SafeSuspense fallback={null}>
           <Footer />
-        </Suspense>
+        </SafeSuspense>
       )}
 
       {belowFoldStage >= 4 && (
-        <Suspense fallback={null}>
+        <SafeSuspense fallback={null}>
           <EnrollModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
           <LeadMagnetModal isOpen={leadModalOpen} onClose={() => setLeadModalOpen(false)} />
           <ExitIntentModal
@@ -541,7 +557,7 @@ export default function App() {
             }}
           />
           <BackToTop />
-        </Suspense>
+        </SafeSuspense>
       )}
     </div>
   );

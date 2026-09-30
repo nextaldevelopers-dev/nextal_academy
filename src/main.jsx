@@ -3,6 +3,12 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import { HelmetProvider } from 'react-helmet-async';
+import { reloadOnceForNewVersion } from './utils/lazyWithReload';
+
+// If a build file from an older deploy can't be loaded, reload once to get the new version
+window.addEventListener('vite:preloadError', (event) => {
+  if (reloadOnceForNewVersion()) event.preventDefault();
+});
 
 // Suppress THREE.Clock deprecation warning from @react-three/fiber
 const originalWarn = console.warn;

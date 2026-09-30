@@ -994,7 +994,7 @@ a:focus-visible, button:focus-visible, .nav-link:focus-visible, .dropdown-item:f
   position: relative;
   width: 100%;
   min-height: 500px;
-  /* overflow: hidden; Removed to prevent trapping intersection observers */
+  overflow: hidden; /* Crucial: Clips nodes off the left/right and bottom */
   display: flex;
   flex-direction: column;
   align-items: center;

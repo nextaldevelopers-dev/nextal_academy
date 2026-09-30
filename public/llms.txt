@@ -1,0 +1,24 @@
+# Nextal Academy
+
+> Nextal Academy is a job-oriented training institute in Nagercoil, Tamil Nadu, India, offering hands-on courses in video editing, motion graphics, generative AI, graphic design, UI/UX design, web development, app development and AI-integrated digital marketing, with placement support.
+
+## Main pages
+
+- [Home](https://nextalacademy.com/): Overview of the academy, courses and enrolment
+- [Blog](https://nextalacademy.com/blogs): Articles on AI, digital marketing and tech careers
+- [Placement](https://nextalacademy.com/placement): Placement support and student outcomes
+
+## Courses
+
+- [Video Editing](https://nextalacademy.com/course/video-editing)
+- [Motion Graphics](https://nextalacademy.com/course/motion-graphics)
+- [Generative AI](https://nextalacademy.com/course/generative-ai)
+- [Graphic Design](https://nextalacademy.com/course/graphic-design)
+- [Web Development](https://nextalacademy.com/course/web-development)
+- [App Development](https://nextalacademy.com/course/app-development)
+- [Digital Marketing](https://nextalacademy.com/course/digital-marketing)
+
+## Articles
+
+- [How AI Agents Are Automating Digital Marketing Tasks](https://nextalacademy.com/blogs/how-ai-agents-are-automating-digital-marketing-tasks)
+- [How to Measure Digital Marketing ROI: Key Metrics Explained](https://nextalacademy.com/blogs/how-to-measure-digital-marketing-roi)

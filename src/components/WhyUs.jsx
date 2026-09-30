@@ -173,11 +173,16 @@ export default function WhyUs({ onSelectService }) {
 
     const animate = (time) => {
       if (prevTimeRef.current !== undefined) {
-        const dt = Math.min((time - prevTimeRef.current) / 1000, 0.1); // Cap delta time at 100ms
+        const rawDt = Math.min((time - prevTimeRef.current) / 1000, 0.1); // Cap delta time at 100ms
+        // Split long frames into small physics steps. With these spring constants a single
+        // step longer than ~70ms is numerically unstable: on slow phones/laptops the cards
+        // would fly off to huge coordinates (e.g. 1e23px) and burn CPU forever.
+        const steps = Math.max(1, Math.ceil(rawDt / (1 / 60)));
+        const dt = rawDt / steps;
 
         // Increment rotation offset slowly
         if (!isPaused && introStarted) {
-          angleOffsetRef.current += 0.085 * dt;
+          angleOffsetRef.current += 0.085 * rawDt;
         }
 
         // Spring constants (Adjusted for slower, graceful entry)
@@ -214,6 +219,7 @@ export default function WhyUs({ onSelectService }) {
             ty = targetRadiusRef.current * Math.sin(angle);
           }
 
+          for (let s = 0; s < steps; s++) {
           // 1. Position Spring Integration
           const fx_pos = -kPos * (posRef.current[idx].x - tx) - cPos * velRef.current[idx].x;
           const fy_pos = -kPos * (posRef.current[idx].y - ty) - cPos * velRef.current[idx].y;
@@ -234,6 +240,22 @@ export default function WhyUs({ onSelectService }) {
           
           tiltRef.current[idx].x += fx_tilt * dt * 0.4;
           tiltRef.current[idx].y += fy_tilt * dt * 0.4;
+          }
+
+          // Safety net: if anything ever becomes non-finite or runs away, snap back to the target
+          const limit = Math.max(targetRadiusRef.current, 100) * 4;
+          const p = posRef.current[idx];
+          if (!Number.isFinite(p.x) || !Number.isFinite(p.y) || Math.abs(p.x) > limit || Math.abs(p.y) > limit) {
+            p.x = tx; p.y = ty;
+            velRef.current[idx].x = 0; velRef.current[idx].y = 0;
+          }
+          if (!Number.isFinite(scaleRef.current[idx]) || Math.abs(scaleRef.current[idx]) > 5) {
+            scaleRef.current[idx] = targetScale; scaleVelRef.current[idx] = 0;
+          }
+          const tl = tiltRef.current[idx];
+          if (!Number.isFinite(tl.x) || !Number.isFinite(tl.y) || Math.abs(tl.x) > 45 || Math.abs(tl.y) > 45) {
+            tl.x = 0; tl.y = 0;
+          }
 
           // Calculate continuous 3D depth based on Y coordinate
           let depthScale = 1.0;

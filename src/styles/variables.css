@@ -100,7 +100,8 @@ html, body {
   scroll-behavior: auto; /* Required for Lenis */
   font-size: var(--text-base);
   scroll-padding-top: 80px;
-  overflow-x: hidden;
+  overflow-x: hidden; /* fallback for very old browsers */
+  overflow-x: clip;   /* clip (not hidden) so position: sticky keeps working */
   width: 100%;
 }
 
@@ -110,6 +111,7 @@ body {
   background-color: var(--bg-body);
   line-height: 1.6;
   overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeSpeed; /* Faster text render */
@@ -151,16 +153,13 @@ img {
 }
 
 :root {
-  --container-max: 92vw;
-  --container-px: 20px;
 }
 
 .page-container, .header-container, .hero-container {
   width: 100%;
-  max-width: var(--container-max) !important;
-  margin-inline: auto;
-  padding-inline: var(--container-px);
-  box-sizing: border-box;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 .container { width: 100%; max-width: min(1240px, 100vw); margin: 0 auto; padding: 0 clamp(1rem, 5vw, 2rem); }
@@ -205,7 +204,7 @@ img {
 
 .btn-secondary {
   background: #ffffff;
-  color: var(--accent-coral);
+  color: #D91060; /* slightly darker pink: 5:1 contrast on white (was #F62477 = 3.9:1, fails WCAG) */
   border-color: #ffffff;
   box-shadow: none;
 }

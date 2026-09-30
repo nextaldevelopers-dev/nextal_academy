@@ -31,8 +31,13 @@
 
   # SPA fallback — all unmatched routes serve index.html
   RewriteRule ^index\.html$ - [L]
+
+  # Missing build files (old /assets/*.js or *.css) must return a real 404, never index.html
+  RewriteRule ^assets/ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
+  # Only page routes (no file extension) go to the app; a missing file like /llms.txt returns 404
+  RewriteCond %{REQUEST_URI} !\.[A-Za-z0-9]{2,5}$
   RewriteRule . /index.html [L]
 </IfModule>
 

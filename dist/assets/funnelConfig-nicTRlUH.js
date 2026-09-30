@@ -1,0 +1,1 @@
+const e={syllabusUrl:"/downloads/nextal-academy-syllabus.pdf",leadCapture:{enabled:!0},exitIntent:{enabled:!0,delayMs:15e3,cooldownHours:24},urgency:{batchDate:"soon",seatsRemaining:5,showCountdown:!0}};export{e as funnelConfig};

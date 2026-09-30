@@ -278,23 +278,34 @@
 /* CTA Band */
 .blog-cta-band {
   background: linear-gradient(135deg, var(--blog-indigo), var(--blog-pink-dark));
-  padding: 80px 0;
+  padding: 20px 0;
   text-align: center;
   color: white;
 }
-.cta-content {
-  max-width: 800px;
+.blog-cta-band .cta-content {
+  max-width: 1100px;
   margin: 0 auto;
+  white-space: normal;
 }
-.cta-content h2 {
-  font-size: clamp(2rem, 4vw, 3.5rem);
+.blog-cta-band .cta-content h2 {
+  font-size: clamp(1.4rem, 2.8vw, 2.4rem);
   margin-bottom: 16px;
-  color: white;
+  white-space: nowrap;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
-.cta-content p {
-  font-size: clamp(1.125rem, 2vw, 1.25rem);
-  margin-bottom: 32px;
+.blog-cta-band .cta-content p {
+  font-size: clamp(1rem, 1.5vw, 1.15rem) !important;
+  margin-bottom: 32px !important;
+  color: #e5e7eb !important;
   opacity: 0.9;
+  max-width: 560px !important;
+  width: auto !important;
+  white-space: normal !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  line-height: 1.65 !important;
+  text-align: center !important;
 }
 
 
@@ -389,10 +400,17 @@
   position: relative;
 }
 @media (min-width: 1024px) {
+  /* Sidebar column runs the full height of the article so the TOC has room to travel */
   .bd-sidebar {
+    position: relative;
+    align-self: stretch;
+  }
+  /* Table of contents follows the reader down the article */
+  .bd-toc {
     position: sticky;
-    top: 100px;
-    align-self: flex-start;
+    top: 110px;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
   }
 }
 .meta-row {
@@ -444,7 +462,8 @@
   display: flex;
   gap: 12px;
 }
-.share-buttons button {
+.share-buttons button,
+.share-buttons a {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -457,8 +476,10 @@
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
+  text-decoration: none;
 }
-.share-buttons button:hover {
+.share-buttons button:hover,
+.share-buttons a:hover {
   border-color: var(--blog-indigo);
   color: var(--blog-indigo);
   background: var(--blog-lavender);
@@ -732,4 +753,16 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Article headings: leave room for the sticky header when jumping from the table of contents */
+.bd-content h2[id] { scroll-margin-top: 110px; }
+
+/* On mobile, allow the CTA heading to wrap naturally */
+@media (max-width: 767px) {
+  .blog-cta-band .cta-content,
+  .blog-cta-band .cta-content h2 {
+    white-space: normal;
+    font-size: clamp(1.4rem, 6vw, 1.8rem) !important;
+  }
 }

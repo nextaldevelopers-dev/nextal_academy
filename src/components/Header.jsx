@@ -115,7 +115,7 @@ export default function Header({ onOpenEnrollModal }) {
           {/* Brand Logo */}
           <a href="#home" className="brand-logo">
             <img
-                src="/academy_logo.webp"
+                src="/academy_logo-320.webp"
                 alt="Nextal Academy"
                 width="150"
                 height="150"
@@ -131,9 +131,9 @@ export default function Header({ onOpenEnrollModal }) {
             <a href="#why-us"  className="nav-link" onClick={closeNav}>Why Us</a>
 
             <div className={`nav-dropdown ${mobileDropdownOpen ? 'mobile-open' : ''}`}>
-              <a href="#" role="button" aria-expanded={mobileDropdownOpen} aria-controls="lectures-dropdown" className="nav-link dropdown-toggle" onClick={(e) => {
-                e.preventDefault();
-                if (window.innerWidth < 1024) {
+              <a href="#syllabus" role="button" aria-expanded={mobileDropdownOpen} aria-controls="lectures-dropdown" className="nav-link dropdown-toggle" onClick={(e) => {
+                if (window.innerWidth <= 992) {
+                  e.preventDefault();
                   e.stopPropagation();
                   setMobileDropdownOpen(prev => {
                     const next = !prev;
@@ -142,25 +142,36 @@ export default function Header({ onOpenEnrollModal }) {
                     }
                     return next;
                   });
+                } else {
+                  // Desktop: navigate to the lectures/syllabus section
+                  e.preventDefault();
+                  const target = document.getElementById('syllabus');
+                  if (target) {
+                    if (window.lenis) {
+                      window.lenis.scrollTo(target, { offset: -80 });
+                    } else {
+                      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }
                 }
               }}>
-                Lectures <ChevronDown size={14} style={{ marginLeft: '4px', transform: mobileDropdownOpen && window.innerWidth < 1024 ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }} />
+                Lectures <ChevronDown size={14} style={{ marginLeft: '4px', transform: mobileDropdownOpen && window.innerWidth <= 992 ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }} />
               </a>
               <div id="lectures-dropdown" className="dropdown-menu" style={{ minWidth: '240px' }}>
                 <div className={`nav-sub-dropdown ${mobileSubDropdownOpen === 'digital' ? 'mobile-open' : ''}`}>
                   <div role="button" tabIndex={0} aria-expanded={mobileSubDropdownOpen === 'digital'} aria-controls="digital-dropdown" className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
-                    if (window.innerWidth < 1024) {
+                    if (window.innerWidth <= 992) {
                       e.preventDefault();
                       e.stopPropagation();
                       toggleSubCategory('digital');
                     }
                   }} onKeyDown={(e) => {
-                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024) {
+                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth <= 992) {
                       e.preventDefault();
                       toggleSubCategory('digital');
                     }
                   }}>
-                    Digital Marketing <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'digital' && window.innerWidth < 1024 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
+                    Digital Marketing <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'digital' && window.innerWidth <= 992 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
                   </div>
                   <div id="digital-dropdown" className="dropdown-menu">
                     <a href="/course/ai-digital-marketing" className="dropdown-item" onClick={closeNav}>AI Integrated Digital Marketing</a>
@@ -170,18 +181,18 @@ export default function Header({ onOpenEnrollModal }) {
                 
                 <div className={`nav-sub-dropdown ${mobileSubDropdownOpen === 'design' ? 'mobile-open' : ''}`}>
                   <div role="button" tabIndex={0} aria-expanded={mobileSubDropdownOpen === 'design'} aria-controls="design-dropdown" className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
-                    if (window.innerWidth < 1024) {
+                    if (window.innerWidth <= 992) {
                       e.preventDefault();
                       e.stopPropagation();
                       toggleSubCategory('design');
                     }
                   }} onKeyDown={(e) => {
-                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024) {
+                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth <= 992) {
                       e.preventDefault();
                       toggleSubCategory('design');
                     }
                   }}>
-                    Design & Creative <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'design' && window.innerWidth < 1024 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
+                    Design & Creative <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'design' && window.innerWidth <= 992 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
                   </div>
                   <div id="design-dropdown" className="dropdown-menu">
                     <a href="/course/ui-ux" className="dropdown-item" onClick={closeNav}>UI/UX Design</a>
@@ -192,18 +203,18 @@ export default function Header({ onOpenEnrollModal }) {
 
                 <div className={`nav-sub-dropdown ${mobileSubDropdownOpen === 'software' ? 'mobile-open' : ''}`}>
                   <div role="button" tabIndex={0} aria-expanded={mobileSubDropdownOpen === 'software'} aria-controls="software-dropdown" className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
-                    if (window.innerWidth < 1024) {
+                    if (window.innerWidth <= 992) {
                       e.preventDefault();
                       e.stopPropagation();
                       toggleSubCategory('software');
                     }
                   }} onKeyDown={(e) => {
-                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024) {
+                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth <= 992) {
                       e.preventDefault();
                       toggleSubCategory('software');
                     }
                   }}>
-                    Software Development <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'software' && window.innerWidth < 1024 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
+                    Software Development <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'software' && window.innerWidth <= 992 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
                   </div>
                   <div id="software-dropdown" className="dropdown-menu">
                     <a href="/course/web-development" className="dropdown-item" onClick={closeNav}>Web Development</a>
@@ -213,18 +224,18 @@ export default function Header({ onOpenEnrollModal }) {
 
                 <div className={`nav-sub-dropdown ${mobileSubDropdownOpen === 'video' ? 'mobile-open' : ''}`}>
                   <div role="button" tabIndex={0} aria-expanded={mobileSubDropdownOpen === 'video'} aria-controls="video-dropdown" className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
-                    if (window.innerWidth < 1024) {
+                    if (window.innerWidth <= 992) {
                       e.preventDefault();
                       e.stopPropagation();
                       toggleSubCategory('video');
                     }
                   }} onKeyDown={(e) => {
-                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024) {
+                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth <= 992) {
                       e.preventDefault();
                       toggleSubCategory('video');
                     }
                   }}>
-                    Video Editing <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'video' && window.innerWidth < 1024 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
+                    Video Editing <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'video' && window.innerWidth <= 992 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
                   </div>
                   <div id="video-dropdown" className="dropdown-menu">
                     <a href="/course/basic-video-editing" className="dropdown-item" onClick={closeNav}>Basic Video Editing</a>
@@ -234,18 +245,18 @@ export default function Header({ onOpenEnrollModal }) {
 
                 <div className={`nav-sub-dropdown ${mobileSubDropdownOpen === 'ai' ? 'mobile-open' : ''}`}>
                   <div role="button" tabIndex={0} aria-expanded={mobileSubDropdownOpen === 'ai'} aria-controls="ai-dropdown" className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
-                    if (window.innerWidth < 1024) {
+                    if (window.innerWidth <= 992) {
                       e.preventDefault();
                       e.stopPropagation();
                       toggleSubCategory('ai');
                     }
                   }} onKeyDown={(e) => {
-                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024) {
+                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth <= 992) {
                       e.preventDefault();
                       toggleSubCategory('ai');
                     }
                   }}>
-                    Generative AI <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'ai' && window.innerWidth < 1024 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
+                    Generative AI <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'ai' && window.innerWidth <= 992 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
                   </div>
                   <div id="ai-dropdown" className="dropdown-menu">
                     <a href="/course/adv-gen-ai" className="dropdown-item" onClick={closeNav}>Advanced Certification in Gen AI</a>

@@ -49,9 +49,7 @@
 }
 @media (min-width: 1600px) and (max-width: 2500px) {
   .container { max-width: 90vw; }
-  .header-container, .hero-container { max-width: 92vw; }
-  html, body { font-size: 21px !important; } /* Boosted text scale for readability */
-  
+  .page-container, .header-container, .hero-container { max-width: 92vw; }
   .brand-logo, .hero-content, .service-detail-main, .service-detail-back-btn { margin-left: 0 !important; }
   .service-detail-sidebar { transform: none !important; }
 }
@@ -59,11 +57,14 @@
 /* For 2856px+ screens: preserve exactly what was previously approved (no changes) */
 @media (min-width: 2501px) {
   .container { max-width: 90vw; }
-  .header-container, .hero-container { max-width: 92vw; }
-  html, body { font-size: 18px !important; } /* Kept exactly the same for 2864px */
-  
+  .page-container, .header-container, .hero-container { max-width: 92vw; }
   .brand-logo, .hero-content, .service-detail-main, .service-detail-back-btn { margin-left: 0 !important; }
   .service-detail-sidebar { transform: none !important; }
+}
+
+/* Smooth fluid font scaling from 1440px upwards — replaces the old stepped 21px/18px jumps */
+@media (min-width: 1440px) {
+  html, body { font-size: clamp(16px, 0.4vw + 10.24px, 20px) !important; }
 }
 .hero-media-wrapper {
   width: 100%;
@@ -764,6 +765,7 @@
   position: relative !important; 
   z-index: 2 !important; 
   padding: clamp(3rem, 6vw, 5.5rem) clamp(1.25rem, 4vw, 2.5rem) !important; 
+  box-sizing: border-box !important;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;

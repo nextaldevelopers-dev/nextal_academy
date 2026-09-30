@@ -1,7 +1,10 @@
 import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { CheckCircle2, Award, Bot, Send, BookOpen, Clapperboard } from 'lucide-react';
 
-const HeroScene = lazy(() => import('./HeroScene'));
+import { lazyWithReload } from '../utils/lazyWithReload';
+import { SafeSuspense } from '../ErrorBoundary';
+
+const HeroScene = lazyWithReload(() => import('./HeroScene'));
 
 export default function Hero({ onOpenEnrollModal, onOpenLeadModal }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
@@ -197,11 +200,11 @@ export default function Hero({ onOpenEnrollModal, onOpenLeadModal }) {
               </div>
 
               {shouldLoad3D ? (
-                <Suspense fallback={
+                <SafeSuspense fallback={
                   <div style={{ width: '100%', height: '100%', borderRadius: '20px', background: 'radial-gradient(circle at center, rgba(142, 68, 173, 0.15) 0%, rgba(0, 0, 0, 0) 70%)', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
                 }>
                   <HeroScene isMobile={isMobile} />
-                </Suspense>
+                </SafeSuspense>
               ) : (
                 <div style={{ width: '100%', height: '100%', borderRadius: '20px', background: 'radial-gradient(circle at center, rgba(142, 68, 173, 0.15) 0%, rgba(0, 0, 0, 0) 70%)' }} />
               )}

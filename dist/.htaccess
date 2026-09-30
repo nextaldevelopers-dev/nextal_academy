@@ -1,0 +1,43 @@
+<IfModule mod_headers.c>
+  # HTML / SEO entry points
+  <FilesMatch "^(index|404)\.html$|^(robots\.txt|sitemap\.xml)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # Vite hashed JS/CSS
+  <FilesMatch "\-[A-Za-z0-9_-]{8}\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Public static assets
+  <FilesMatch "\.(webp|png|jpg|jpeg|gif|svg|glb|gltf|hdr)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+
+  # Fonts
+  <FilesMatch "\.(woff2|woff|ttf|otf)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+
+  # Dynamic PHP
+  <FilesMatch "\.php$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # SPA fallback — all unmatched routes serve index.html
+  RewriteRule ^index\.html$ - [L]
+
+  # Missing build files (old /assets/*.js or *.css) must return a real 404, never index.html
+  RewriteRule ^assets/ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Fallback for Hostinger in case mod_rewrite fails to catch the route
+ErrorDocument 404 /index.html
