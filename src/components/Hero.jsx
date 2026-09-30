@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
-import { CheckCircle2, Award, Bot, Send, BookOpen, Clapperboard } from 'lucide-react';
+import { CheckCircle2, Award, Bot, Send, BookOpen, Clapperboard, Video, Cpu, Film, Figma, MapPin, Briefcase, GraduationCap } from 'lucide-react';
 
 import { lazyWithReload } from '../utils/lazyWithReload';
 import { onFirstInteraction } from '../utils/onFirstInteraction';
@@ -129,7 +129,7 @@ export default function Hero({ onOpenEnrollModal, onOpenLeadModal }) {
 
             {!isMobile && (
               <>
-                <p className="hero-subtitle lcp-element" style={{ maxWidth: '600px', color: '#d3d3d3' }}>
+                <p className="hero-subtitle lcp-element" style={{ color: '#d3d3d3' }}>
                   Premium Job-Oriented Academy in Nagercoil. Master Video Editing, Motion Graphics, Full Stack Development, and Advanced Generative AI to launch your dream career.
                 </p>
 
@@ -144,6 +144,14 @@ export default function Hero({ onOpenEnrollModal, onOpenLeadModal }) {
                     <BookOpen size={16} /> Download Syllabus
                   </button>
                 </div>
+
+                <div className="hero-trust">
+                  <div className="trust-item"><Briefcase size={14} /> Placement support</div>
+                  <div className="trust-dot">•</div>
+                  <div className="trust-item"><Award size={14} /> Hands-on real projects</div>
+                  <div className="trust-dot">•</div>
+                  <div className="trust-item"><MapPin size={14} /> Nagercoil campus</div>
+                </div>
               </>
             )}
 
@@ -151,6 +159,15 @@ export default function Hero({ onOpenEnrollModal, onOpenLeadModal }) {
           </div>
 
         <div className="hero-media-wrapper">
+            {/* Decorative orbit behind the 3D robot + course chips on its edge (styles: end of responsive.css) */}
+            <div className="hero-orbit-ring hero-deco" aria-hidden="true"></div>
+            <div className="hero-orbit-chips hero-deco" aria-hidden="true">
+              <div className="hero-chip chip-left"><Video size={16} /> Video Editing</div>
+              <div className="hero-chip chip-top-right"><Cpu size={16} /> Generative AI</div>
+              <div className="hero-chip chip-bottom-left"><Film size={16} /> Motion Graphics</div>
+              <div className="hero-chip chip-right"><Figma size={16} /> UI/UX Design</div>
+            </div>
+
             <div className="hero-image-frame anim-image delay-5" style={{ position: 'relative', background: 'transparent', padding: '0', boxShadow: 'none', border: 'none', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}>
               {/* Static Speech Bubble Overlay */}
               <div style={{

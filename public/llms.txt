@@ -10,13 +10,16 @@
 
 ## Courses
 
-- [Video Editing](https://nextalacademy.com/course/video-editing)
-- [Motion Graphics](https://nextalacademy.com/course/motion-graphics)
-- [Generative AI](https://nextalacademy.com/course/generative-ai)
+- [AI Integrated Digital Marketing](https://nextalacademy.com/course/ai-digital-marketing)
+- [Diploma in Digital Marketing](https://nextalacademy.com/course/diploma-digital-marketing)
+- [UI/UX Design Mastery](https://nextalacademy.com/course/ui-ux)
 - [Graphic Design](https://nextalacademy.com/course/graphic-design)
-- [Web Development](https://nextalacademy.com/course/web-development)
-- [App Development](https://nextalacademy.com/course/app-development)
-- [Digital Marketing](https://nextalacademy.com/course/digital-marketing)
+- [Designer Pro](https://nextalacademy.com/course/designer-pro)
+- [Full Stack Web Development](https://nextalacademy.com/course/web-development)
+- [Full Stack Mobile App Development](https://nextalacademy.com/course/app-development)
+- [Video Editing Mastery](https://nextalacademy.com/course/basic-video-editing)
+- [Motion Graphics Mastery](https://nextalacademy.com/course/motion-graphics)
+- [Advanced Certification in Gen AI](https://nextalacademy.com/course/adv-gen-ai)
 
 ## Articles
 

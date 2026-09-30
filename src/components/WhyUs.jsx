@@ -62,7 +62,9 @@ export default function WhyUs({ onSelectService }) {
       } else if (width <= 992) {
         targetRadiusRef.current = 280;
       } else {
-        targetRadiusRef.current = 440;
+        // Scales with the screen (300px at ~1000px wide -> 440px from ~1470px wide).
+        // Must match .orbit-carousel-container height in components.css: height = 2 * (radius + 100)
+        targetRadiusRef.current = Math.round(Math.min(440, Math.max(300, width * 0.3)));
       }
       
       // Responsive scale factor for cards - increased for mobile visibility

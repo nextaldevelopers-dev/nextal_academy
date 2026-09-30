@@ -509,7 +509,19 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
     }
   ];
 
-  const module = modules.find(m => m.id === slug) || modules[0];
+  // Friendly / older URLs that were shared or listed in the sitemap -> real course ids
+  const SLUG_ALIASES = {
+    'video-editing': 'basic-video-editing',
+    'generative-ai': 'adv-gen-ai',
+    'gen-ai': 'adv-gen-ai',
+    'digital-marketing': 'ai-digital-marketing',
+    'ui-ux-design': 'ui-ux',
+    'uiux': 'ui-ux',
+  };
+  const resolvedSlug = SLUG_ALIASES[slug] || slug;
+  const module = modules.find(m => m.id === resolvedSlug) || modules[0];
+  // Canonical always points to the real course URL, so Google never indexes a wrong/duplicate address
+  const canonicalSlug = module.id;
 
   const academyFeatures = [
     "100% Practical Training",
@@ -528,10 +540,10 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       <Helmet>
         <title>{module ? `${module.title.replace(/\n/g, ' ')} | Nextal Academy Nagercoil` : 'Course | Nextal Academy'}</title>
         <meta name="description" content={module ? module.desc : 'Explore our job-oriented courses at Nextal Academy Nagercoil.'} />
-        <link rel="canonical" href={`https://nextalacademy.com/course/${slug}`} />
+        <link rel="canonical" href={`https://nextalacademy.com/course/${canonicalSlug}`} />
         <meta property="og:title" content={module ? `${module.title.replace(/\n/g, ' ')} | Nextal Academy` : 'Course | Nextal Academy'} />
         <meta property="og:description" content={module ? module.desc : ''} />
-        <meta property="og:url" content={`https://nextalacademy.com/course/${slug}`} />
+        <meta property="og:url" content={`https://nextalacademy.com/course/${canonicalSlug}`} />
         <meta property="og:image" content={module?.image ? `https://nextalacademy.com${module.image}` : 'https://nextalacademy.com/academy_logo.webp'} />
       </Helmet>
       <style>

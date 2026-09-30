@@ -977,7 +977,9 @@
 .orbit-carousel-container {
   position: relative;
   width: 100%;
-  height: clamp(480px, 70vw, 840px); /* Was hardcoded 840px — now fluid */
+  /* Tall enough for the orbit radius set in WhyUs.jsx (0.3 x screen width, 300-440px)
+     plus the cards and labels: height = 2 * (radius + 100) */
+  height: clamp(820px, calc(60vw + 200px), 1080px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -988,7 +990,7 @@
 
 @media (max-width: 992px) {
   .orbit-carousel-container {
-    height: 600px;
+    height: 740px; /* radius 280px (WhyUs.jsx) + cards */
   }
 }
 
@@ -2075,3 +2077,5 @@ html[data-low-performance="true"] .center-card-energy-halo {
   transform: none !important;
   transition: none !important;
 }
+
+/* Home hero desktop layout lives at the END of responsive.css ("HOME HERO — FINAL LAYOUT"). */

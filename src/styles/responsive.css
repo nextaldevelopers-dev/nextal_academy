@@ -1582,3 +1582,171 @@ a:focus-visible, button:focus-visible, .nav-link:focus-visible, .dropdown-item:f
     margin-bottom: 1rem !important;
   }
 }
+
+/* =====================================================================
+   HOME HERO — FINAL LAYOUT
+   Kept at the very end of the last stylesheet, with `.hero-section` in every
+   selector, so it wins over the older hero rules above (many use !important).
+   ===================================================================== */
+
+/* Decorations + trust line are hidden by default (phones / tablets) */
+.hero-section .hero-deco,
+.hero-section .hero-trust { display: none; }
+
+/* Tablet & phone: keep the existing stacked layout, but align the
+   LEARN • … • BECOME line with the rest of the left-aligned text */
+@media (max-width: 1023px) {
+  .hero-section .hero-content .hero-evolution-steps { justify-content: flex-start !important; align-self: flex-start !important; }
+}
+
+/* ---------- Laptop & desktop (1024px +) ---------- */
+@media (min-width: 1024px) {
+  /* 1024-1279px: text column + a robot column that never gets narrower than 360px */
+  .hero-section .hero-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.8fr) !important;
+    gap: clamp(1.5rem, 3vw, 4rem) !important;
+    align-items: center !important;
+  }
+
+  /* One clean text block: heading, steps, paragraph, buttons and trust line share ONE width */
+  .hero-section .hero-content {
+    display: grid !important;
+    justify-items: start !important;
+    align-content: center !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    text-align: left !important;
+  }
+  .hero-section .hero-title {
+    width: auto !important;
+    font-size: clamp(2.4rem, 3.4vw, 3rem) !important;
+    line-height: 1.1 !important;
+    margin-bottom: 1.25rem !important;
+  }
+  .hero-section .hero-evolution-steps { margin-bottom: 1.5rem !important; }
+
+  /* Paragraph + trust line FILL the block width but never widen it
+     (width:0 + min-width:100% = "as wide as the heading / steps above") */
+  .hero-section .hero-subtitle {
+    width: 0 !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    text-align: left !important;
+    text-wrap: pretty;
+    line-height: 1.7 !important;
+    margin-bottom: 2rem !important;
+  }
+  .hero-section .hero-trust {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    width: 0;
+    min-width: 100%;
+    margin-top: 1.75rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.72);
+  }
+  .hero-section .hero-trust .trust-item { display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+  .hero-section .hero-trust .trust-dot { color: rgba(255, 255, 255, 0.3); }
+
+  /* Right side: the 3D stage fills and is centred in the remaining space */
+  .hero-section .hero-media-wrapper {
+    width: 100% !important;
+    justify-self: stretch !important;
+    height: clamp(380px, 38vw, 700px) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-section .hero-image-frame { position: relative; z-index: 2; }
+
+  /* Orbit: glow + ring behind the robot (and same-size layer for the chips, above it) */
+  .hero-section .hero-orbit-ring,
+  .hero-section .hero-orbit-chips {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(92%, clamp(340px, 36vw, 720px));
+    aspect-ratio: 1 / 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-section .hero-orbit-ring {
+    z-index: 0;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: radial-gradient(circle at 50% 50%,
+      rgba(246, 36, 119, 0.14) 0%,
+      rgba(142, 68, 173, 0.12) 32%,
+      rgba(94, 8, 107, 0.06) 55%,
+      transparent 70%);
+    box-shadow: inset 0 0 90px rgba(142, 68, 173, 0.22), 0 0 120px rgba(94, 8, 107, 0.25);
+  }
+  .hero-section .hero-orbit-ring::before {   /* dashed inner ring */
+    content: '';
+    position: absolute;
+    inset: 13%;
+    border-radius: 50%;
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+  }
+  .hero-section .hero-orbit-ring::after {    /* faint outer ring */
+    content: '';
+    position: absolute;
+    inset: -8%;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .hero-section .hero-orbit-chips { z-index: 3; display: none; }
+}
+
+/* ---------- Large laptops & desktops (1280px +): bigger type + course chips ---------- */
+@media (min-width: 1280px) {
+  /* Column 1 = the text block (its own width), column 2 = all remaining space for the robot */
+  .hero-section .hero-grid { grid-template-columns: auto minmax(0, 1fr) !important; }
+  .hero-section .hero-content { max-width: min(100%, 46rem) !important; }
+  .hero-section .hero-orbit-chips { display: block; }
+  .hero-section .hero-title { font-size: clamp(3rem, 1.6vw + 1.6rem, 4.25rem) !important; line-height: 1.08 !important; }
+  .hero-section .hero-evolution-steps { flex-wrap: nowrap !important; white-space: nowrap; }
+  .hero-section .hero-subtitle { font-size: 1.15rem !important; }
+
+  .hero-section .hero-orbit-chips .hero-chip {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.05rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    animation: heroChipFloat 6s ease-in-out 2.5s infinite;  /* starts after load */
+  }
+  .hero-section .hero-orbit-chips .hero-chip svg { color: var(--accent-coral, #F62477); flex-shrink: 0; }
+  /* Chips sit on the ring's edge, away from the robot's speech bubble (top-left) */
+  .hero-section .chip-left         { top: 50%;   left: -9%;   margin-top: -1.2rem; }
+  .hero-section .chip-top-right    { top: 7%;    right: -4%;  animation-delay: 2.8s; }
+  .hero-section .chip-bottom-left  { bottom: 7%; left: 4%;    animation-delay: 3.1s; }
+  .hero-section .chip-right        { top: 62%;   right: -10%; animation-delay: 3.4s; }
+}
+
+@keyframes heroChipFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-section .hero-orbit-chips .hero-chip { animation: none !important; }
+}
+
+/* Phones: leave room at the bottom of the footer so the floating back-to-top
+   button doesn't cover the copyright / Terms & Privacy links */
+@media (max-width: 768px) {
+  .site-footer { padding-bottom: 5.5rem !important; }
+}
