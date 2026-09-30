@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { 
   GraduationCap, Wrench, Briefcase, FolderOpen, Clapperboard, 
@@ -33,8 +33,26 @@ export default function Highlights() {
   const proxyRef = useRef({ rotation: 0 });
 
   const staticRingRef = useRef(null);
+  const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || !('IntersectionObserver' in window)) {
+      setIsInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.05) {
+        setIsInView(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: '0px', threshold: 0.05 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isInView) return;
     const mm = gsap.matchMedia();
     
     mm.add("(prefers-reduced-motion: no-preference)", () => {
@@ -52,12 +70,13 @@ export default function Highlights() {
         // Calculate safe diameter for desktop, but force massive radius on mobile/tablet to spread nodes
         let calculatedRadius;
         if (window.innerWidth > 1024) {
-          calculatedRadius = Math.max(w * 0.7, 700) / 2;
+          // Massive radius to ensure nodes completely clear the center dashed ring
+          calculatedRadius = Math.max(w * 2.0, 1600) / 2; 
         } else if (window.innerWidth > 768) {
-          calculatedRadius = Math.max(w * 1.5, 650) / 2;
+          calculatedRadius = Math.max(w * 2.5, 1600) / 2;
         } else {
           // Mobile: Force massive radius to flatten curve and prevent overlap with central ring
-          calculatedRadius = Math.max(w * 3.2, 1200) / 2; 
+          calculatedRadius = Math.max(w * 4.0, 1400) / 2; 
         }
         radius = calculatedRadius;
         
@@ -194,8 +213,14 @@ export default function Highlights() {
        if (!containerRef.current) return;
        const w = containerRef.current.offsetWidth;
        const nodeSize = window.innerWidth > 480 ? Math.min(200, window.innerWidth * 0.16) : 130;
-       const safeDiameter = Math.max(w - nodeSize - 20, 240); 
-       const radius = window.innerWidth > 1024 ? Math.max(w * 0.7, 700) / 2 : safeDiameter / 2;
+       let radius;
+       if (window.innerWidth > 1024) {
+         radius = Math.max(w * 2.0, 1600) / 2;
+       } else if (window.innerWidth > 768) {
+         radius = Math.max(w * 2.5, 1600) / 2;
+       } else {
+         radius = Math.max(w * 4.0, 1400) / 2;
+       }
        
        const centerX = w / 2;
        const verticalOffset = window.innerWidth > 768 ? 175 : 120;
@@ -235,7 +260,7 @@ export default function Highlights() {
     });
     
     return () => mm.revert();
-  }, []);
+  }, [isInView]);
 
   return (
     <section className="section highlights-section" ref={sectionRef}>

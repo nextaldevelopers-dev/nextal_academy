@@ -5,14 +5,16 @@
   overflow: hidden; /* Fix clipping boundary: clipping happens at section edges */
   padding-block: var(--section-spacing-lg);
   background-color: var(--bg-surface);
-  min-height: 800px;
+  /* Raised from 800px: ensures enough height so orbit arc bottom nodes aren't clipped */
+  min-height: 950px;
   
   /* Fluid sizing tokens for Spotlight Carousel */
   --sl-node-size: clamp(140px, 16vw, 180px);   /* White card inner circle */
   --sl-ring-size: clamp(210px, 28vw, 290px);   /* Gradient donut ring */
   --sl-ring-thickness: clamp(18px, 2.2vw, 30px); /* Donut ring thickness */
   --sl-dashed-inset: clamp(-16px, -2vw, -24px); /* Larger gap for dashed outer ring */
-  --sl-wrapper-height: clamp(340px, 44vw, 500px); /* Extra height so ring top has room */
+  /* Raised upper bound from 500px → 620px so arc nodes have vertical room */
+  --sl-wrapper-height: clamp(340px, 44vw, 620px);
 }
 
 .highlights-section .hero-container {
@@ -247,6 +249,9 @@
 }
 
 @media (max-width: 768px) {
+  .highlights-section {
+    min-height: auto;
+  }
   .course-highlights-cluster {
     gap: 0.75rem 1rem;
   }

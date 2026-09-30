@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Video, Wand2, Smartphone, Database, Brain, Network, Briefcase, Handshake } from 'lucide-react';
-import gsap from 'gsap';
+
 
 const services = [
   { id: 0, icon: Video, title: "Video Editing", subtitle: "Adobe Premiere Pro", desc: "Cinematic cuts & professional grading", slug: "video-editing", label: "PRO", bgColor: "#ffe8e8", color: "#d32f2f" },
@@ -54,17 +54,25 @@ export default function WhyUs({ onSelectService }) {
     const updateLayout = () => {
       const width = window.innerWidth;
       
-      // Fluid radius calculation
-      targetRadiusRef.current = Math.min(440, Math.max(130, width * 0.35));
+      // Sync radius precisely with CSS breakpoints
+      if (width <= 480) {
+        targetRadiusRef.current = 170; // Increased radius for mobile to spread nodes
+      } else if (width <= 768) {
+        targetRadiusRef.current = 220;
+      } else if (width <= 992) {
+        targetRadiusRef.current = 280;
+      } else {
+        targetRadiusRef.current = 440;
+      }
       
-      // Responsive scale factor for cards
+      // Responsive scale factor for cards - increased for mobile visibility
       if (width < 380) {
-        responsiveFactorRef.current = 0.5;
-      } else if (width < 480) {
-        responsiveFactorRef.current = 0.6;
-      } else if (width < 768) {
-        responsiveFactorRef.current = 0.75;
-      } else if (width < 992) {
+        responsiveFactorRef.current = 0.65; // increased from 0.5
+      } else if (width <= 480) {
+        responsiveFactorRef.current = 0.72; // increased from 0.6
+      } else if (width <= 768) {
+        responsiveFactorRef.current = 0.8; // increased from 0.75
+      } else if (width <= 992) {
         responsiveFactorRef.current = 0.85;
       } else {
         responsiveFactorRef.current = 1;
@@ -119,8 +127,42 @@ export default function WhyUs({ onSelectService }) {
     return () => clearTimeout(timer);
   }, []);
 
+  // IntersectionObserver to pause RAF when WhyUs is below the fold
+  const [isSectionVisible, setIsSectionVisible] = useState(false);
+
+  useEffect(() => {
+    const el = whyusSectionRef.current;
+    if (!el || !('IntersectionObserver' in window)) {
+      setIsSectionVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsSectionVisible(entry.isIntersecting && document.visibilityState === 'visible');
+    }, { rootMargin: '150px 0px', threshold: 0.05 });
+
+    observer.observe(el);
+
+    const handleVis = () => {
+      if (document.visibilityState !== 'visible') {
+        setIsSectionVisible(false);
+      } else if (el) {
+        const rect = el.getBoundingClientRect();
+        setIsSectionVisible(rect.top < window.innerHeight && rect.bottom > 0);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVis);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVis);
+    };
+  }, []);
+
   // Frame animation loop with spring physics and dynamic 3D depth effects
   useEffect(() => {
+    if (!isSectionVisible) return;
+
     // Respect prefers-reduced-motion — skip physics loop entirely
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
@@ -328,10 +370,7 @@ export default function WhyUs({ onSelectService }) {
       <div
         className="text-center mx-auto why-us-heading-viewport anim-text delay-2"
         style={{
-          marginBottom: '10rem',
           position: 'relative',
-          height: '12rem',
-          overflow: 'hidden',
         }}
       >
         {headlines.map((item, idx) => {
@@ -362,8 +401,8 @@ export default function WhyUs({ onSelectService }) {
               }}
             >
               <h2
-                className="section-title"
-                style={{ margin: 0, fontSize: '3.5rem', lineHeight: '1.2' }}
+                className="section-title why-us-headline"
+                style={{ margin: 0 }}
               >
                 {item.title}<br />{item.sub}
               </h2>
@@ -445,8 +484,20 @@ export default function WhyUs({ onSelectService }) {
                       onClick={(e) => handleCardClick(service, e)}
                     >
                       {/* Icon container box */}
-                      <div className="orbit-card-image-box" style={{ justifyContent: 'center', backgroundColor: isCenter ? '#fff' : service.bgColor, borderColor: isCenter ? '' : service.color }}>
-                        <service.icon size={46} color={isCenter ? '#000053' : service.color} strokeWidth={1.5} className="orbit-card-icon" />
+                      <div className="orbit-card-image-box" style={{ 
+                        justifyContent: 'center', 
+                        flexDirection: isCenter ? 'column' : 'row',
+                        backgroundColor: isCenter ? '#fff' : service.bgColor, 
+                        borderColor: isCenter ? '' : service.color 
+                      }}>
+                        <service.icon size={isCenter ? 38 : 46} color={isCenter ? '#000053' : service.color} strokeWidth={1.5} className="orbit-card-icon" style={{ marginBottom: isCenter ? '0.25rem' : '0' }} />
+                        
+                        {isCenter && (
+                          <div className="center-card-content inside-circle-text" style={{ marginTop: '0.25rem', padding: '0 0.5rem' }}>
+                            <span className="center-subtitle" style={{ fontSize: '0.65rem' }}>{service.subtitle}</span>
+                            <span className="center-title" style={{ fontSize: '1rem', marginTop: '0.1rem' }}>{service.title}</span>
+                          </div>
+                        )}
                         
                         {/* Dynamic shininess element overlay (3D reflection) */}
                         <div className="orbit-card-glass-reflection"></div>
@@ -460,18 +511,18 @@ export default function WhyUs({ onSelectService }) {
                       </div>
 
                       {/* Info structure toggleable by CSS classes based on center status */}
-                      <div className="orbit-card-meta">
-                        {isCenter ? (
-                          <div className="center-card-content">
-                            <span className="center-subtitle">{service.subtitle}</span>
-                            <span className="center-title">{service.title}</span>
-                          </div>
-                        ) : (
+                      {!isCenter ? (
+                        <div className="orbit-card-meta">
                           <div className="orbit-card-content">
                             <span className="orbit-title">{service.title}</span>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      ) : (
+                        <div className="center-card-content below-circle-text" style={{ marginTop: '0.8rem', padding: '0 0.5rem' }}>
+                          <span className="center-subtitle" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#333' }}>{service.subtitle}</span>
+                          <span className="center-title" style={{ fontSize: '1.2rem', marginTop: '0.2rem', fontWeight: 800 }}>{service.title}</span>
+                        </div>
+                      )}
                     </a>
                   </div>
                 </div>

@@ -11,8 +11,7 @@ export default function Footer() {
           <div className="footer-brand anim-image delay-1">
             <a href="#home" className="footer-logo">
               <img
-                src="/nextal-white-logo-140.webp"
-                srcSet="/nextal-white-logo-140.webp 1x, /nextal-white-logo-280.webp 2x"
+                src="/nextal-white-logo.webp"
                 alt="Nextal Academy"
                 width="140"
                 height="140"
@@ -74,7 +73,7 @@ export default function Footer() {
             <h3>Get In Touch</h3>
             <div className="footer-contact-item">
               <MapPin size={18} />
-              <a href="https://maps.google.com/maps?vet=10CAAQoqAOahcKEwj4iYCE566WAxUAAAAAHQAAAAAQBw..i&sca_esv=ed6da2d1bfbc369e&mstk=AUtExfBkC4aRU7ZywGLz57uZmi4W6UoXa6oqu49ZESuXeMrkxP4gn8GW2ZEUgV6rLyq1Xl34ny6qvGpGZCdGX_Dw1C97AzrhyteeoYKk1dl5boH8m6M4mT1O7YP1PMgl4-J9d4TGa5rTCgKejTX6Yt8dKT-jfq0CxlnItr3iyWTB19iVdWwWo8Z56h2mQXZ5YTj16w9K&pvq=Cg0vZy8xMXpoNHJkenB5gAEB&fvr=1&cs=1&um=1&ie=UTF-8&fb=1&gl=in&sa=X&ftid=0x3b04f96c0c22d09f:0xb380cd21e268d473" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <a href="https://maps.google.com/maps?vet=10CAAQoqAOahcKEwj4iYCE566WAxUAAAAAHQAAAAAQBw..i&sca_esv=ed6da2d1bfbc369e&mstk=AUtExfBkC4aRU7ZywGLz57uZmi4W6UoXa6oqu49ZESuXeMrkxP4gn8GW2ZEUgV6rLyq1Xl34ny6qvGpGZCdGX_Dw1C97AzrhyteeoYKk1dl5boH8m6M4mT1O7YP1PMgl4-J9d4TGa5rTCgKejTX6Yt8dKT-jfq0CxlnItr3iyWTB19iVdWwWo8Z56h2mQXZ5YTj16w9K&pvq=Cg0vZy8xMXpoNHJkenB5gAEB&fvr=1&cs=1&um=1&ie=UTF-8&fb=1&gl=in&sa=X&ftid=0x3b04f96c0c22d09f:0xb380cd21e268d473" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', lineHeight: '1.5' }}>
                 1st Floor, Chandrakala complex, 28-35/10, Azhagiyamandapam, Tamil Nadu 629168
               </a>
             </div>
@@ -100,7 +99,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
             <p>&copy; 2026 Nextal Academy. All Rights Reserved.</p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.6)' }}>
               <a href="/terms" style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-coral)'} onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}>Terms &amp; Conditions</a>
@@ -108,9 +107,6 @@ export default function Footer() {
               <a href="/privacy" style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-coral)'} onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}>Privacy Policy</a>
             </div>
           </div>
-          <a href="#home" className="footer-back-top">
-            <ArrowUp size={16} /> Back to top
-          </a>
         </div>
       </div>
     </footer>

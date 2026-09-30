@@ -150,11 +150,17 @@ img {
   display: block;
 }
 
-.header-container, .hero-container {
+:root {
+  --container-max: 92vw;
+  --container-px: 20px;
+}
+
+.page-container, .header-container, .hero-container {
   width: 100%;
-  max-width: 1500px;
-  margin: 0 auto;
-  padding: 0 20px;
+  max-width: var(--container-max) !important;
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+  box-sizing: border-box;
 }
 
 .container { width: 100%; max-width: min(1240px, 100vw); margin: 0 auto; padding: 0 clamp(1rem, 5vw, 2rem); }

@@ -10,10 +10,35 @@ export default function Header({ onOpenEnrollModal }) {
   const [mounted, setMounted] = useState(false);
   const lastScrollY = useRef(0);
 
+  const toggleSubCategory = (categoryKey) => {
+    setMobileSubDropdownOpen(prev =>
+      prev === categoryKey ? null : categoryKey
+    );
+  };
+
   useEffect(() => {
     // Small delay to ensure CSS transitions trigger
     setTimeout(() => setMounted(true), 50);
   }, []);
+
+  useEffect(() => {
+    if (mobileNavOpen) {
+      let count = parseInt(document.body.dataset.modalCount || '0', 10);
+      if (count === 0) {
+        document.body.dataset.originalOverflow = window.getComputedStyle(document.body).overflow;
+        document.body.style.overflow = 'hidden';
+      }
+      document.body.dataset.modalCount = count + 1;
+      
+      return () => {
+        let currentCount = parseInt(document.body.dataset.modalCount || '1', 10) - 1;
+        document.body.dataset.modalCount = currentCount;
+        if (currentCount <= 0) {
+          document.body.style.overflow = document.body.dataset.originalOverflow || '';
+        }
+      };
+    }
+  }, [mobileNavOpen]);
 
   // Reset header visibility on every route change (popstate)
   useEffect(() => {
@@ -74,6 +99,14 @@ export default function Header({ onOpenEnrollModal }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mobileNavOpen]);
 
+  // Reset dropdown accordion states whenever mobile nav closes
+  useEffect(() => {
+    if (!mobileNavOpen) {
+      setMobileDropdownOpen(false);
+      setMobileSubDropdownOpen(null);
+    }
+  }, [mobileNavOpen]);
+
   return (
     <header className={`site-header${scrolled ? ' scrolled' : ''}${isHidden ? ' hidden' : ''}`}>
       <div className="header-container">
@@ -82,8 +115,7 @@ export default function Header({ onOpenEnrollModal }) {
           {/* Brand Logo */}
           <a href="#home" className="brand-logo">
             <img
-                src="/academy_logo-150.webp"
-                srcSet="/academy_logo-150.webp 1x, /academy_logo-300.webp 2x"
+                src="/academy_logo.webp"
                 alt="Nextal Academy"
                 width="150"
                 height="150"
@@ -99,43 +131,59 @@ export default function Header({ onOpenEnrollModal }) {
             <a href="#why-us"  className="nav-link" onClick={closeNav}>Why Us</a>
 
             <div className={`nav-dropdown ${mobileDropdownOpen ? 'mobile-open' : ''}`}>
-              <a href="#" className="nav-link dropdown-toggle" onClick={(e) => {
+              <a href="#" role="button" aria-expanded={mobileDropdownOpen} aria-controls="lectures-dropdown" className="nav-link dropdown-toggle" onClick={(e) => {
                 e.preventDefault();
                 if (window.innerWidth < 1024) {
                   e.stopPropagation();
-                  setMobileDropdownOpen(!mobileDropdownOpen);
+                  setMobileDropdownOpen(prev => {
+                    const next = !prev;
+                    if (!next) {
+                      setMobileSubDropdownOpen(null);
+                    }
+                    return next;
+                  });
                 }
               }}>
                 Lectures <ChevronDown size={14} style={{ marginLeft: '4px', transform: mobileDropdownOpen && window.innerWidth < 1024 ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }} />
               </a>
-              <div className="dropdown-menu" style={{ minWidth: '240px' }}>
+              <div id="lectures-dropdown" className="dropdown-menu" style={{ minWidth: '240px' }}>
                 <div className={`nav-sub-dropdown ${mobileSubDropdownOpen === 'digital' ? 'mobile-open' : ''}`}>
-                  <div className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
+                  <div role="button" tabIndex={0} aria-expanded={mobileSubDropdownOpen === 'digital'} aria-controls="digital-dropdown" className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
                     if (window.innerWidth < 1024) {
                       e.preventDefault();
                       e.stopPropagation();
-                      setMobileSubDropdownOpen(mobileSubDropdownOpen === 'digital' ? null : 'digital');
+                      toggleSubCategory('digital');
+                    }
+                  }} onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024) {
+                      e.preventDefault();
+                      toggleSubCategory('digital');
                     }
                   }}>
                     Digital Marketing <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'digital' && window.innerWidth < 1024 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
                   </div>
-                  <div className="dropdown-menu">
+                  <div id="digital-dropdown" className="dropdown-menu">
                     <a href="/course/ai-digital-marketing" className="dropdown-item" onClick={closeNav}>AI Integrated Digital Marketing</a>
                     <a href="/course/diploma-digital-marketing" className="dropdown-item" onClick={closeNav}>Diploma in Digital Marketing</a>
                   </div>
                 </div>
                 
                 <div className={`nav-sub-dropdown ${mobileSubDropdownOpen === 'design' ? 'mobile-open' : ''}`}>
-                  <div className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
+                  <div role="button" tabIndex={0} aria-expanded={mobileSubDropdownOpen === 'design'} aria-controls="design-dropdown" className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
                     if (window.innerWidth < 1024) {
                       e.preventDefault();
                       e.stopPropagation();
-                      setMobileSubDropdownOpen(mobileSubDropdownOpen === 'design' ? null : 'design');
+                      toggleSubCategory('design');
+                    }
+                  }} onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024) {
+                      e.preventDefault();
+                      toggleSubCategory('design');
                     }
                   }}>
                     Design & Creative <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'design' && window.innerWidth < 1024 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
                   </div>
-                  <div className="dropdown-menu">
+                  <div id="design-dropdown" className="dropdown-menu">
                     <a href="/course/ui-ux" className="dropdown-item" onClick={closeNav}>UI/UX Design</a>
                     <a href="/course/graphic-design" className="dropdown-item" onClick={closeNav}>Graphic Design</a>
                     <a href="/course/designer-pro" className="dropdown-item" onClick={closeNav}>Designer Pro</a>
@@ -143,46 +191,63 @@ export default function Header({ onOpenEnrollModal }) {
                 </div>
 
                 <div className={`nav-sub-dropdown ${mobileSubDropdownOpen === 'software' ? 'mobile-open' : ''}`}>
-                  <div className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
+                  <div role="button" tabIndex={0} aria-expanded={mobileSubDropdownOpen === 'software'} aria-controls="software-dropdown" className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
                     if (window.innerWidth < 1024) {
                       e.preventDefault();
-                      setMobileSubDropdownOpen(mobileSubDropdownOpen === 'software' ? null : 'software');
+                      e.stopPropagation();
+                      toggleSubCategory('software');
+                    }
+                  }} onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024) {
+                      e.preventDefault();
+                      toggleSubCategory('software');
                     }
                   }}>
                     Software Development <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'software' && window.innerWidth < 1024 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
                   </div>
-                  <div className="dropdown-menu">
+                  <div id="software-dropdown" className="dropdown-menu">
                     <a href="/course/web-development" className="dropdown-item" onClick={closeNav}>Web Development</a>
                     <a href="/course/app-development" className="dropdown-item" onClick={closeNav}>App Development</a>
                   </div>
                 </div>
 
                 <div className={`nav-sub-dropdown ${mobileSubDropdownOpen === 'video' ? 'mobile-open' : ''}`}>
-                  <div className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
+                  <div role="button" tabIndex={0} aria-expanded={mobileSubDropdownOpen === 'video'} aria-controls="video-dropdown" className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
                     if (window.innerWidth < 1024) {
                       e.preventDefault();
                       e.stopPropagation();
-                      setMobileSubDropdownOpen(mobileSubDropdownOpen === 'video' ? null : 'video');
+                      toggleSubCategory('video');
+                    }
+                  }} onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024) {
+                      e.preventDefault();
+                      toggleSubCategory('video');
                     }
                   }}>
                     Video Editing <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'video' && window.innerWidth < 1024 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
                   </div>
-                  <div className="dropdown-menu">
+                  <div id="video-dropdown" className="dropdown-menu">
                     <a href="/course/basic-video-editing" className="dropdown-item" onClick={closeNav}>Basic Video Editing</a>
                     <a href="/course/motion-graphics" className="dropdown-item" onClick={closeNav}>Motion Graphics</a>
                   </div>
                 </div>
 
                 <div className={`nav-sub-dropdown ${mobileSubDropdownOpen === 'ai' ? 'mobile-open' : ''}`}>
-                  <div className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
+                  <div role="button" tabIndex={0} aria-expanded={mobileSubDropdownOpen === 'ai'} aria-controls="ai-dropdown" className="dropdown-item sub-dropdown-toggle" onClick={(e) => {
                     if (window.innerWidth < 1024) {
                       e.preventDefault();
-                      setMobileSubDropdownOpen(mobileSubDropdownOpen === 'ai' ? null : 'ai');
+                      e.stopPropagation();
+                      toggleSubCategory('ai');
+                    }
+                  }} onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024) {
+                      e.preventDefault();
+                      toggleSubCategory('ai');
                     }
                   }}>
                     Generative AI <ChevronRight size={14} style={{ transform: mobileSubDropdownOpen === 'ai' && window.innerWidth < 1024 ? 'rotate(90deg)' : 'none', transition: 'transform 0.3s' }} />
                   </div>
-                  <div className="dropdown-menu">
+                  <div id="ai-dropdown" className="dropdown-menu">
                     <a href="/course/adv-gen-ai" className="dropdown-item" onClick={closeNav}>Advanced Certification in Gen AI</a>
                   </div>
                 </div>
@@ -192,16 +257,34 @@ export default function Header({ onOpenEnrollModal }) {
             <a href="/placement" className="nav-link" onClick={closeNav}>Placement</a>
             <a href="/blogs"     className="nav-link" onClick={closeNav}>Blogs</a>
             <a href="#faq"       className="nav-link" onClick={closeNav}>FAQ</a>
+
+            {/* Enroll Now inside mobile nav — only visible when nav is open */}
+            <button
+              className="btn btn-primary mobile-nav-enroll"
+              onClick={() => { onOpenEnrollModal(); closeNav(); }}
+            >
+              <Sparkles size={16} /> Enroll Now
+            </button>
           </nav>
 
           {/* Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button className="btn btn-primary" onClick={onOpenEnrollModal}>
+            {/* Enroll Now — hidden on mobile; appears inside mobile nav menu instead */}
+            <button className="btn btn-primary header-enroll-desktop" onClick={onOpenEnrollModal}>
               <Sparkles size={16} /> Enroll Now
             </button>
             <button
               className="mobile-toggle"
-              onClick={() => setMobileNavOpen(prev => !prev)}
+              onClick={() => {
+                setMobileNavOpen(prev => {
+                  const next = !prev;
+                  if (next) {
+                    setMobileDropdownOpen(false);
+                    setMobileSubDropdownOpen(null);
+                  }
+                  return next;
+                });
+              }}
               aria-label="Toggle navigation"
               aria-expanded={mobileNavOpen}
               aria-controls="main-nav-menu"

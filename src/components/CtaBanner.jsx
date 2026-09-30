@@ -1,5 +1,9 @@
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Clock } from 'lucide-react';
+import { funnelConfig } from '../config/funnelConfig';
+
 export default function CtaBanner({ onOpenEnrollModal }) {
+  const { batchDate, seatsRemaining, showCountdown } = funnelConfig.urgency;
+
   return (
     <section className="section" style={{ padding: '0 0 5rem 0', backgroundColor: '#ffffff', transition: 'color 0.3s ease' }}>
       <div className="container-fluid">
@@ -11,10 +15,17 @@ export default function CtaBanner({ onOpenEnrollModal }) {
             <p style={{ color: 'inherit', opacity: 0.85, marginTop: '1rem', marginBottom: '2rem' }}>
               Launch your career in Development, AI, UI/UX, Motion Graphics, and Marketing. Transform your passion into professional skills with our expert-led training.
             </p>
-            <div className="cta-button-wrapper">
+            <div className="cta-button-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
               <button className="btn btn-secondary" onClick={onOpenEnrollModal} style={{ fontSize: '1.1rem', padding: '1rem 2.5rem' }}>
                 <UserPlus size={20} /> Join Nextal Academy Today
               </button>
+              
+              {showCountdown && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem 1rem', borderRadius: '50px', fontSize: '0.95rem' }}>
+                  <Clock size={16} color="#00C896" />
+                  <span>Next batch starts <strong>{batchDate}</strong> — Only <strong style={{ color: '#00C896' }}>{seatsRemaining} seats</strong> left</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

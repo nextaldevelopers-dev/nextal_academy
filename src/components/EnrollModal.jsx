@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, CheckCircle } from 'lucide-react';
 
 export default function EnrollModal({ isOpen, onClose }) {
@@ -12,33 +12,48 @@ export default function EnrollModal({ isOpen, onClose }) {
     batch: 'weekday'
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      let count = parseInt(document.body.dataset.modalCount || '0', 10);
+      if (count === 0) {
+        document.body.dataset.originalOverflow = window.getComputedStyle(document.body).overflow;
+        document.body.style.overflow = 'hidden';
+      }
+      document.body.dataset.modalCount = count + 1;
+      
+      return () => {
+        let currentCount = parseInt(document.body.dataset.modalCount || '1', 10) - 1;
+        document.body.dataset.modalCount = currentCount;
+        if (currentCount <= 0) {
+          document.body.style.overflow = document.body.dataset.originalOverflow || '';
+        }
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
 
-    fetch('/mailer.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-      setLoading(false);
-      if (data.status === 'success') {
-        setSubmitted(true);
-      } else {
-        alert('Failed to send application. Please try again or email us directly.');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      setLoading(false);
-      alert('An error occurred. Please try again.');
-    });
+    const textMessage = `New Enrollment Application\n\nName: ${formData.fullName}\nPhone: ${formData.phone}\nEmail: ${formData.email}\nCourse: ${formData.course}\nBatch: ${formData.batch}`;
+    const encodedMessage = encodeURIComponent(textMessage);
+    const whatsappUrl = `https://wa.me/919487167617?text=${encodedMessage}`;
+    
+    // Send event to Google Analytics
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'enrollment_whatsapp_click', {
+        'event_category': 'conversion',
+        'event_label': 'WhatsApp Enrollment',
+        'course': formData.course
+      });
+    }
+
+    window.open(whatsappUrl, '_blank');
+    
+    setLoading(false);
+    setSubmitted(true);
   };
 
   const handleClose = () => {

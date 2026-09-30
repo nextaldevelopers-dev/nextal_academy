@@ -1,0 +1,159 @@
+# Lighthouse Performance Optimization Plan (Preserving 3D Doll 100%)
+
+Improve the website's Lighthouse Performance score from **52** to **90+** by resolving the critical rendering bottlenecks, deferring non-critical 3D and physics work, eliminating artificial delays, optimizing render-blocking CSS, and localizing 3D assets, while **strictly preserving the 3D doll 100% intact, interactive, animated, and visually identical on desktop and mobile**.
+
+---
+
+## Baseline Audit (Captured on `http://localhost:4173` Preview Build)
+
+* **Performance Score**: 52 / 100
+* **First Contentful Paint (FCP)**: 4.7s
+* **Largest Contentful Paint (LCP)**: 6.1s (Element: `p.hero-subtitle`)
+* **Total Blocking Time (TBT)**: 400ms
+* **Speed Index**: 7.5s
+* **Time to Interactive (TTI)**: 14.0s
+* **Cumulative Layout Shift (CLS)**: 0.002 (already excellent)
+* **Main-Thread Work**: 25.5s (GSAP ticker + RAF loops + forced reflows)
+* **Render-Blocking CSS Delay**: 150ms - 1050ms
+
+---
+
+## Root Causes Identified
+
+1. **Artificial Blocking Loading Screen ([`src/App.jsx`](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/src/App.jsx#L84-L111))**:
+   - `App.jsx` enforces a minimum display timer of 800ms to 1500ms (on throttled network) plus a 700ms CSS fade-out transition for `<LoadingScreen />`.
+   - Because `.gpm-loader` is a fixed opaque overlay (`position: fixed; inset: 0; z-index: 99999; background: #0b0718`), it hides the hero text and header from Lighthouse and real users, delaying FCP to 4.7s and LCP to 6.1s.
+   - Directly violates the user constraint: *"DO NOT artificially delay the entire page / add fake loading screens"*.
+
+2. **Render-Blocking Main CSS (`dist/assets/index-*.css`)**:
+   - The compiled stylesheet (76 KB / 15 KB gzip) is linked as a standard render-blocking `<link rel="stylesheet">`, preventing the browser from painting critical hero elements until the file is fully downloaded.
+
+3. **Sub-optimal 3D Trigger in [`src/components/Hero.jsx`](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/src/components/Hero.jsx#L25-L48)**:
+   - Currently waits for user interaction (mouse move/scroll) with a fallback timeout of 4000ms. In automated audits or for passive users, the doll is delayed for 4 full seconds.
+   - The correct behavior requested by the user is: **Critical page content renders instantly → fast LCP → schedule 3D scene loading via `requestIdleCallback` → doll appears quickly**.
+
+4. **Continuous WebGL RAF & Viewport Leaks ([`src/components/HeroScene.jsx`](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/src/components/HeroScene.jsx#L72-L77))**:
+   - The Three.js WebGL canvas runs an unthrottled `useFrame` animation loop indefinitely, even when the user scrolls down to the footer or when the browser tab is hidden.
+   - Canvas does not configure `frameloop="demand"` or pause when off-screen.
+
+5. **External Draco Decoders & Heavy HDR Asset**:
+   - [`src/components/Robot_cat.jsx`](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/src/components/Robot_cat.jsx#L17) fetches Draco decoders from `https://www.gstatic.com/draco/v1/decoders/` (cross-origin DNS, TLS, and network latency).
+   - [`public/potsdamer_platz_1k.hdr`](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/public/potsdamer_platz_1k.hdr) is **1.54 MB**, which is downloaded over the network every time the 3D scene loads.
+
+6. **Below-the-Fold Unthrottled Physics Loop ([`src/components/WhyUs.jsx`](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/src/components/WhyUs.jsx#L132-L240))**:
+   - `WhyUs.jsx` runs a continuous `requestAnimationFrame` spring physics loop updating 7 cards and lines, consuming main-thread CPU time even while the user is at the top of the page.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Strict 3D Doll Preservation Guarantee**:
+> The 3D robot cat doll (`RobotCat.jsx`), its meshes, materials, interactive mouse tracking, eye blinking, arm waving, speech bubble, camera angles, lighting, and visual styling will **NOT be removed, replaced, hidden, simplified, or redesigned**. The doll will remain 100% visually identical and fully interactive on both desktop and mobile.
+
+> [!NOTE]
+> The artificial `<LoadingScreen />` overlay on initial mount will be removed so the hero text and navbar paint immediately (FCP < 1.0s, LCP < 1.5s). `<LoadingScreen />` can still be used as a suspense fallback for heavy sub-pages if requested, but will not block the initial page.
+
+---
+
+## Proposed Changes
+
+### 1. Application Shell & Critical Paint
+
+#### [MODIFY] [src/App.jsx](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/src/App.jsx)
+- Remove `initialLoading`, `isFadingOut`, and the artificial `minDisplayTime` promise delay (800ms-1500ms) on initial mount.
+- Remove the full-screen `<LoadingScreen />` overlay on initial mount, allowing the critical Header and Hero HTML/CSS to paint instantly.
+- Dynamically import `@studio-freight/lenis` inside `useEffect` post-paint so Lenis does not inflate the critical bundle.
+- Guard `ScrollTrigger.refresh()` in `MutationObserver` with debounce to prevent forced synchronous layout thrashing.
+
+---
+
+### 2. Render-Blocking CSS Optimization
+
+#### [MODIFY] [index.html](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/index.html)
+- Ensure critical variables, fonts, and above-the-fold layout styles (header + hero typography and grid) are present in the inline `<style>` block to guarantee zero Flash of Unstyled Content (FOUC).
+
+#### [MODIFY] [vite.config.js](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/vite.config.js)
+- Add a lightweight Vite build plugin (`nonBlockingCssPlugin`) using `transformIndexHtml` to convert the main stylesheet link to:
+  ```html
+  <link rel="preload" as="style" href="/assets/index-*.css" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="/assets/index-*.css"></noscript>
+  ```
+  This eliminates the 150ms-1050ms render-blocking CSS delay without breaking any styling.
+
+---
+
+### 3. Intelligent 3D Scheduling & WebGL Lifecycle
+
+#### [MODIFY] [src/components/Hero.jsx](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/src/components/Hero.jsx)
+- Replace the 4000ms interaction-dependent delay with immediate post-paint scheduling:
+  ```javascript
+  useEffect(() => {
+    let id;
+    if ('requestIdleCallback' in window) {
+      id = window.requestIdleCallback(() => setShouldLoad3D(true), { timeout: 800 });
+    } else {
+      id = setTimeout(() => setShouldLoad3D(true), 60);
+    }
+    return () => {
+      if ('cancelIdleCallback' in window) window.cancelIdleCallback(id);
+      else clearTimeout(id);
+    };
+  }, []);
+  ```
+- Result: Hero text and LCP paint first, then the 3D bundle immediately loads and paints the doll without unnecessary waiting.
+
+#### [MODIFY] [src/components/HeroScene.jsx](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/src/components/HeroScene.jsx)
+- Implement viewport and tab visibility observer:
+  - Pause WebGL rendering (`frameloop={isVisible ? 'always' : 'never'}`) when hero is scrolled out of the viewport or when `document.visibilityState === 'hidden'`.
+  - Resume rendering automatically when hero returns to view.
+- Cap device pixel ratio: `dpr={Math.min(window.devicePixelRatio || 1, 1.5)}`.
+- Add `stencil: false` to WebGL renderer parameters to save unnecessary GPU memory.
+
+---
+
+### 4. 3D Assets & Draco Optimization
+
+#### [NEW] Local Draco decoders in `public/draco/gltf/`
+- Copy `draco_decoder.wasm`, `draco_decoder.js`, and `draco_wasm_wrapper.js` from `node_modules/three/examples/jsm/libs/draco/gltf/` to `public/draco/gltf/`.
+
+#### [MODIFY] [src/components/Robot_cat.jsx](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/src/components/Robot_cat.jsx)
+- Update Draco decoder path from `https://www.gstatic.com/draco/v1/decoders/` to local `/draco/gltf/`, eliminating cross-origin latency.
+
+#### [MODIFY] [public/potsdamer_platz_1k.hdr](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/public/potsdamer_platz_1k.hdr)
+- Back up original to `public/potsdamer_platz_1k.backup.hdr`.
+- Downsample HDR environment map from 1024x512 to 512x256 (reducing file size from 1.54 MB to 524 KB, saving ~1 MB of network transfer while keeping specular reflections identical).
+
+---
+
+### 5. Below-the-Fold Physics Throttling
+
+#### [MODIFY] [src/components/WhyUs.jsx](file:///c:/Users/mohamed%20imran/Desktop/nextal_academy%20-%20Copy/src/components/WhyUs.jsx)
+- Add an `IntersectionObserver` to pause the physics `requestAnimationFrame` loop when the `WhyUs` section is outside the viewport, freeing up 100% of the main thread for the hero and 3D doll.
+
+---
+
+## Verification Plan
+
+### Automated Verification
+1. **Production Build**:
+   ```powershell
+   npm run build
+   ```
+   Verify that all chunks build cleanly without errors.
+2. **Lighthouse Performance Audit**:
+   ```powershell
+   npx lighthouse http://localhost:4173 --only-categories=performance --preset=perf --chrome-flags="--headless" --output=json --output-path=optimized-lh.json
+   ```
+   Verify:
+   - Overall Performance Score >= 90
+   - FCP < 1.5s (Target: ~0.8s)
+   - LCP < 2.5s (Target: ~1.2s - 1.8s)
+   - TBT < 200ms
+   - CLS < 0.05
+
+### Visual & Functional QA
+1. **Browser Visual Inspection**:
+   - Inspect `http://localhost:4173` on Desktop (1440x900, 1920x1080) and Mobile (375x667, 390x844).
+   - Confirm the 3D robot cat doll is **100% visible, fully animated, floating, tracking mouse cursor, waving arm, and blinking eyes**.
+   - Confirm no visual cropping, no layout shifts, and no styling glitches.

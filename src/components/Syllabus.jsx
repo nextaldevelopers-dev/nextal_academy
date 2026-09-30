@@ -58,9 +58,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Mail,
-  Star
+  Star,
+  Download
 } from 'lucide-react';
-import gsap from 'gsap';
+
 
 const AnimatedCounter = ({ target, suffix, delay, color = '#000000' }) => {
   const [count, setCount] = React.useState(0);
@@ -127,14 +128,7 @@ const AnimatedCounter = ({ target, suffix, delay, color = '#000000' }) => {
   );
 };
 
-export default function Syllabus() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-  const animationRef = useRef();
-  const startTimeRef = useRef(null);
-  const SLIDE_DURATION = 5000;
-
+export default function Syllabus({ onOpenLeadModal }) {
   const modules = [
     {
       id: 'ai-digital-marketing',
@@ -353,42 +347,32 @@ export default function Syllabus() {
     }
   ];
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const animationRef = useRef();
+  const startTimeRef = useRef(null);
+  const SLIDE_DURATION = 5000;
+
   useEffect(() => {
     if (isHovered) {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      startTimeRef.current = null;
+      if (animationRef.current) clearTimeout(animationRef.current);
       return;
     }
 
-    const animate = (time) => {
-      if (!startTimeRef.current) {
-        startTimeRef.current = time - (progress / 100) * SLIDE_DURATION;
-      }
-      const elapsed = time - startTimeRef.current;
-      const currentProgress = Math.min((elapsed / SLIDE_DURATION) * 100, 100);
-      
-      setProgress(currentProgress);
+    animationRef.current = setTimeout(() => {
+      handleNext();
+    }, SLIDE_DURATION);
 
-      if (currentProgress < 100) {
-        animationRef.current = requestAnimationFrame(animate);
-      } else {
-        handleNext();
-      }
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationRef.current);
+    return () => clearTimeout(animationRef.current);
   }, [currentIndex, isHovered]);
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % modules.length);
-    setProgress(0);
     if (startTimeRef) startTimeRef.current = null;
   };
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev - 1 + modules.length) % modules.length);
-    setProgress(0);
     startTimeRef.current = null;
   };
 
@@ -454,7 +438,6 @@ export default function Syllabus() {
                           className={`slider-dot ${isActive ? 'active' : ''}`}
                           onClick={() => {
                             setCurrentIndex(idx);
-                            setProgress(0);
                             if (startTimeRef) startTimeRef.current = null;
                           }}
                           aria-label={`Go to slide ${idx + 1}`}
@@ -535,6 +518,16 @@ export default function Syllabus() {
           </div>
 
         </div>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+        <button className="btn btn-secondary" onClick={() => {
+          if (window.gtag) window.gtag('event', 'syllabus_cta_click', { event_category: 'engagement', source: 'syllabus_section' });
+          onOpenLeadModal();
+        }} style={{ padding: '0.8rem 2rem', fontSize: '1.1rem' }}>
+          <Download size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+          Download Full Curriculum PDF
+        </button>
       </div>
 
     </section>

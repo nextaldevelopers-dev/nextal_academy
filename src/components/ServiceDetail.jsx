@@ -160,27 +160,27 @@ export default function ServiceDetail({ slug, onBack, onOpenEnrollModal }) {
         <meta property="og:description" content={service.desc} />
         <meta property="og:url" content={`https://nextalacademy.com/service/${slug}`} />
       </Helmet>
-      <div className="container">
+      <div className="container" style={{ maxWidth: '1500px' }}>
         {/* Back Button */}
         <button onClick={onBack} className="service-detail-back-btn anim-button delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', color: 'var(--accent-coral)', fontWeight: '600', cursor: 'pointer', marginBottom: '2.5rem', padding: '0', fontSize: '1rem' }}>
           <ArrowLeft size={18} /> Back to Home
         </button>
 
-        <div className="service-detail-grid" style={{ display: 'grid', gap: '2rem', alignItems: 'stretch' }}>
+        <div className="service-detail-grid">
           {/* Main Info */}
           <div className="service-detail-main" style={{ display: 'flex', flexDirection: 'column' }}>
-            <h1 className="service-detail-title anim-text delay-2" style={{ fontSize: '3rem', color: 'var(--primary-dark)', fontWeight: '800', lineHeight: '1.1', marginBottom: '1rem' }}>
+            <h1 className="service-detail-title anim-text delay-2" style={{ fontSize: 'clamp(1.65rem, 5vw, 2.75rem)', color: 'var(--primary-dark)', fontWeight: '800', lineHeight: '1.2', marginBottom: '1rem', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
               {service.title}
             </h1>
-            <p className="service-detail-subtitle anim-text delay-3" style={{ fontSize: '1.25rem', color: 'var(--accent-coral)', fontWeight: '600', marginBottom: '1.5rem' }}>
+            <p className="service-detail-subtitle anim-text delay-3" style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', color: 'var(--accent-coral)', fontWeight: '600', marginBottom: '1.25rem', lineHeight: '1.4' }}>
               {service.subtitle}
             </p>
-            <p className="service-detail-desc anim-text delay-4" style={{ fontSize: '1.05rem', color: 'var(--text-body)', lineHeight: '1.75', marginBottom: '3rem' }}>
+            <p className="service-detail-desc anim-text delay-4" style={{ fontSize: 'clamp(0.95rem, 2vw, 1.05rem)', color: 'var(--text-body)', lineHeight: '1.75', marginBottom: '2.5rem' }}>
               {service.desc}
             </p>
 
             {/* Benefits Panel */}
-            <div className="service-curriculum-panel" style={{ flex: 1, background: 'var(--bg-surface)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)', padding: '2.5rem', boxShadow: 'var(--shadow-sm)', marginBottom: 0 }}>
+            <div className="service-curriculum-panel" style={{ flex: 1, background: 'var(--bg-surface)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', marginBottom: 0 }}>
               <h3 style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', marginBottom: '1.5rem', fontWeight: '700' }}>Why Choose Nextal Academy?</h3>
               <div className="curriculum-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {[
@@ -205,18 +205,7 @@ export default function ServiceDetail({ slug, onBack, onOpenEnrollModal }) {
             className="service-detail-sidebar anim-card delay-3 interactive-sidebar" 
             style={{ 
               display: 'flex', 
-              flexDirection: 'column', 
-              position: 'sticky', 
-              top: '100px', 
-              borderRadius: 'var(--radius-lg)', 
-              padding: '2.5rem', 
-              color: 'var(--text-white)', 
-              boxShadow: 'var(--shadow-lg)',
-              overflow: 'hidden',
-              background: 'rgba(45, 5, 60, 0.85)', // Darker base for better text contrast
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              flexDirection: 'column'
             }}
             onMouseMove={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
@@ -227,14 +216,9 @@ export default function ServiceDetail({ slug, onBack, onOpenEnrollModal }) {
             {/* Animated Background Blobs */}
             <div className="sidebar-blob blob-1"></div>
             <div className="sidebar-blob blob-2"></div>
-            
-            {/* Cursor Spotlight with Text */}
-            <div className="sidebar-spotlight">
-              <span className="spotlight-follow-text">NEXTAL ACADEMY</span>
-            </div>
 
             {/* Content Container (z-index above blobs) */}
-            <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', flex: 1, minHeight: 'auto' }}>
               <h3 style={{ fontSize: '1.5rem', color: 'var(--text-white)', fontWeight: '700', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Sparkles size={20} className="text-accent" style={{ color: 'var(--accent-coral)' }} /> Course Details
               </h3>
@@ -263,7 +247,7 @@ export default function ServiceDetail({ slug, onBack, onOpenEnrollModal }) {
                   {service.outcomes.map((outcome, idx) => (
                     <div className="outcome-item anim-slide-up" key={idx} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', animationDelay: `${0.6 + (idx * 0.1)}s` }}>
                       <CheckCircle2 size={16} style={{ color: '#10b981', flexShrink: 0, marginTop: '3px' }} />
-                      <span style={{ fontSize: '0.95rem', color: '#ffffff', lineHeight: '1.4' }}>{outcome}</span>
+                      <span style={{ fontSize: '0.95rem', color: '#ffffff', lineHeight: '1.4', wordBreak: 'break-word', overflowWrap: 'break-word' }}>{outcome}</span>
                     </div>
                   ))}
                 </div>

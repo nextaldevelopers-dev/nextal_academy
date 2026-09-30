@@ -6,13 +6,12 @@ import React, { useRef, useState, useEffect } from 'react'
 import { useLoader, useGraph, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { PerspectiveCamera } from '@react-three/drei/core/PerspectiveCamera'
-import { Html } from '@react-three/drei/web/Html'
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
 export default function RobotCat(props) {
-  const gltf = useLoader(GLTFLoader, '/robot_cat_draco.gltf', (loader) => {
+  const gltf = useLoader(GLTFLoader, '/robot_cat.glb', (loader) => {
     const dracoLoader = new DRACOLoader()
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/')
     loader.setDRACOLoader(dracoLoader)
@@ -54,28 +53,6 @@ export default function RobotCat(props) {
   const rightArmRef = useRef()
   const leftEyeRef  = useRef()
   const rightEyeRef = useRef()
-
-  // ── Speech bubble ────────────────────────────────────────────
-  const [speechStep, setSpeechStep] = useState(0)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSpeechStep(1)
-      setTimeout(() => {
-        setSpeechStep(2)
-        setTimeout(() => setSpeechStep(0), 4000)
-      }, 2500)
-    }, 10000)
-    return () => clearInterval(interval)
-  }, [])
 
   // ── Animation ────────────────────────────────────────────────
   useFrame((state) => {
@@ -169,30 +146,6 @@ export default function RobotCat(props) {
               <mesh geometry={nodes.Triangle_2.geometry} material={accentMaterial} position={[-1.554, 60.25, -19.529]} rotation={[-0.175, Math.PI / 2, 0]} />
               <mesh geometry={nodes.Triangle.geometry}   material={accentMaterial} position={[-1.554, 60.25,  19.625]} rotation={[ 0.175, Math.PI / 2, 0]} />
             </group>{/* end headRef */}
-
-            {/* Static Speech Bubble (does not rotate with head) */}
-            <Html
-              position={isMobile ? [-40, 70, 25] : [-45, 75, 30]}
-              center
-              style={{
-                opacity: speechStep > 0 ? 1 : 0,
-                transform: `translateY(${speechStep > 0 ? '0' : '15px'}) scale(${speechStep > 0 ? 1 : 0.5})`,
-                transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                pointerEvents: 'none',
-                zIndex: 10,
-              }}
-            >
-              <div className="robot-bubble">
-                <span style={{ 
-                  fontSize: isMobile ? '1rem' : '1.25rem', 
-                  fontWeight: 700, 
-                  color: '#4B1D95', 
-                  whiteSpace: 'nowrap' 
-                }}>
-                  {speechStep === 1 ? 'Hi!!' : 'Welcome To Nextal'}
-                </span>
-              </div>
-            </Html>
 
             {/* Left leg — inside the y=133 parent, so local y=-59 = absolute y=74 */}
             <mesh geometry={nodes.Cube_3.geometry} material={customMaterial} position={[-18.748, -59.574, -13.312]} rotation={[0, Math.PI / 2, 0]} />

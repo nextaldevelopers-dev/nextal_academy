@@ -1,8 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { visualizer } from 'rollup-plugin-visualizer';
+
+function nonBlockingCssPlugin() {
+  return {
+    name: 'non-blocking-css',
+    transformIndexHtml(html) {
+      return html.replace(
+        /<link rel="stylesheet" crossorigin href="(\/assets\/index-[^"]+\.css)">/g,
+        '<link rel="preload" as="style" crossorigin href="$1" onload="this.onload=null;this.rel=\'stylesheet\'"><noscript><link rel="stylesheet" crossorigin href="$1"></noscript>'
+      );
+    }
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), nonBlockingCssPlugin(), visualizer({ filename: 'stats.html', open: false })],
   server: {
     port: 3000,
     open: true
@@ -26,10 +39,11 @@ export default defineConfig({
           if (id.includes('node_modules/lucide-react')) {
             return 'vendor-icons';
           }
-          // React + ReactDOM — critical, must load first
+          // React + ReactDOM + Vite runtime helpers — critical, must load first
           if (id.includes('node_modules/react-dom') ||
               id.includes('node_modules/react/') ||
-              id.includes('node_modules/react-router')) {
+              id.includes('node_modules/react-router') ||
+              id.includes('vite/preload-helper')) {
             return 'vendor-react';
           }
         }

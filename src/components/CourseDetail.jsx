@@ -7,7 +7,7 @@ import {
   PlaySquare, Layout, Instagram, Facebook, Youtube, Smartphone, Linkedin, 
   BadgePercent, Megaphone, Captions, Zap, Headphones, Music, Clock, 
   Gauge, VolumeX, Subtitles, Image, Scissors, Repeat, AlignLeft, Cpu, Star, Film,
-  Brain, Database, Code, Terminal, Server, Users, Flag, Mail, MapPin, Calendar, Trophy, ArrowUpRight, Monitor, Shield
+  Brain, Database, Code, Terminal, Server, Users, Flag, Mail, MapPin, Calendar, Trophy, ArrowUpRight, Monitor, Shield, Briefcase, TrendingUp, Wrench, Handshake
 } from 'lucide-react';
 import '../course-premium.css';
 
@@ -75,6 +75,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       id: 'ai-digital-marketing',
       title: 'AI Integrated\nDigital Marketing',
       image: '/course page images/AI Integrated Digital Marketing.webp',
+      video: '/subpage_gif/digital_marketing.mp4',
       desc: 'Master the future of marketing with our comprehensive AI Integrated Digital Marketing course. Learn to leverage artificial intelligence across all core digital marketing channels.',
       topics: [
         { label: 'Module 1: Introduction to Digital Marketing', icon: <BookOpen size={16} /> },
@@ -111,7 +112,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
     {
       id: 'diploma-digital-marketing',
       title: 'Diploma in\nDigital Marketing',
-      image: '/course page images/diplomo in digital marketing.webp',
+      image: '/course page images/diploma_animated.webp',
       desc: 'Master the complete spectrum of digital marketing from organic social media to advanced analytics and e-commerce.',
       topics: [
         { label: 'Module 1: Introduction to Digital Marketing', icon: <BookOpen size={16} /> },
@@ -155,6 +156,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       id: 'ui-ux',
       title: 'UI/UX Design Mastery',
       image: '/course page images/UIUX Design.webp',
+      video: '/subpage_gif/uiux_designer.mp4',
       desc: 'A comprehensive Six-Month Mastery Course covering everything from Graphic Design fundamentals to advanced UI/UX, Prototyping, and AI tools.',
       topics: [
         { label: 'Module 1: Introduction to Graphic Design', icon: <BookOpen size={16} /> },
@@ -206,6 +208,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       id: 'graphic-design',
       title: 'Graphic Design',
       image: '/course page images/Graphic Design.webp',
+      video: '/subpage_gif/graphic_designer.mp4',
       desc: 'Learn industry-standard graphic design tools and techniques to create stunning visual content for brands.',
       topics: [
         { label: 'Module 1: Introduction to Graphic Design', icon: <BookOpen size={16} /> },
@@ -245,6 +248,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       id: 'designer-pro',
       title: 'Designer Pro',
       image: '/course page images/Designer Pro.webp',
+      video: '/subpage_gif/designer_pro.mp4',
       desc: 'The ultimate design masterclass combining graphic design, UI/UX, and motion graphics for complete creative professionals.',
       topics: [
         { label: 'Module 1: Principles of Visual Design', icon: <Palette size={16} /> },
@@ -281,6 +285,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       id: 'web-development',
       title: 'Full Stack Web Development',
       image: '/course page images/Web Development.webp',
+      video: '/subpage_gif/web_developer.mp4',
       desc: 'Become a full-stack developer by mastering frontend and backend technologies like React, Node.js, and databases with a 6-month mastery plan.',
       topics: [
         { label: 'Module 1: Programming Fundamentals', icon: <Code size={16} /> },
@@ -320,6 +325,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       id: 'app-development',
       title: 'Full Stack Mobile App Development',
       image: '/course page images/App Development.webp',
+      video: '/subpage_gif/app_developer.mp4',
       desc: 'Master full stack cross-platform mobile app development with Flutter, Firebase, and AI integration for iOS and Android.',
       topics: [
         { label: 'Module 1: Programming Fundamentals', icon: <Terminal size={16} /> },
@@ -359,6 +365,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       id: 'basic-video-editing',
       title: 'Video Editing Mastery',
       image: '/course page images/basic video editing.webp',
+      video: '/subpage_gif/video_editing.mp4',
       desc: 'Learn the fundamentals of video editing to create engaging content for YouTube, Instagram Reels, and corporate videos with a complete 3-month curriculum.',
       topics: [
         { label: 'Module 1: Video Editing Fundamentals', icon: <Film size={16} /> },
@@ -398,6 +405,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       id: 'motion-graphics',
       title: 'Motion Graphics Mastery',
       image: '/course page images/Motion Graphics.webp',
+      video: '/subpage_gif/motion_graphics.mp4',
       desc: 'A complete six-month mastery course to learn After Effects, VFX, 3D integration, and professional motion graphics from beginner to advanced level.',
       topics: [
         { label: 'Module 1: Fundamentals of Video Production & Editing', icon: <Film size={16} /> },
@@ -440,6 +448,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
       id: 'adv-gen-ai',
       title: 'Advanced Certification in Gen AI',
       image: '/genai_and_agenai.webp',
+      video: '/subpage_gif/ai_developer.mp4',
       desc: 'Master Generative AI, LLMs, RAG, and AI Agents to build production-ready applications through hands-on real-world engineering projects.',
       topics: [
         { label: 'Introduction to Generative AI', icon: <Sparkles size={16} /> },
@@ -628,20 +637,32 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
             </button>
           </div>
           <div className="course-detail-media" style={{ boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
-            <img
-              src={module.image}
-              srcSet={module.image
-                ? `${encodeURI(module.image.replace('.webp', '-300.webp'))} 300w, ${encodeURI(module.image.replace('.webp', '-600.webp'))} 600w, ${encodeURI(module.image)} 800w`
-                : undefined
-              }
-              sizes="(max-width: 768px) 300px, (max-width: 1200px) 600px, 800px"
-              alt={module.title}
-              width="800"
-              height="519"
-              style={{ width: '100%', height: 'auto', aspectRatio: '3/2', objectFit: 'cover' }}
-              loading="lazy"
-              decoding="async"
-            />
+            {module.video ? (
+              <video
+                src={module.video}
+                autoPlay
+                loop
+                muted
+                playsInline
+                disablePictureInPicture
+                style={{ width: '100%', height: 'auto', aspectRatio: '3/2', objectFit: 'cover', pointerEvents: 'none' }}
+              />
+            ) : (
+              <img
+                src={module.image}
+                srcSet={module.image
+                  ? `${encodeURI(module.image.replace('.webp', '-300.webp'))} 300w, ${encodeURI(module.image.replace('.webp', '-600.webp'))} 600w, ${encodeURI(module.image)} 800w`
+                  : undefined
+                }
+                sizes="(max-width: 768px) 300px, (max-width: 1200px) 600px, 800px"
+                alt={module.title}
+                width="800"
+                height="519"
+                style={{ width: '100%', height: 'auto', aspectRatio: '3/2', objectFit: 'cover' }}
+                loading="lazy"
+                decoding="async"
+              />
+            )}
           </div>
         </div>
 
@@ -668,8 +689,11 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
             <div className="module-premium-grid">
               {module.weeklyModules.map((week, idx) => (
                 <div key={idx} className="module-premium-card">
-                  <div className="module-badge">{idx + 1}</div>
-                  <div className="module-text">{week}</div>
+                  <div className="module-badge">{String(idx + 1).padStart(2, '0')}</div>
+                  <div className="module-content">
+                    <div className="module-text">{week}</div>
+                  </div>
+                  <div className="module-arrow">→</div>
                 </div>
               ))}
             </div>
@@ -684,10 +708,13 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
             <div className="module-premium-grid">
               {module.topics.map((t, idx) => (
                 <div className="module-premium-card" key={idx}>
-                  <div className="module-badge" style={{ background: 'linear-gradient(135deg, #00C3FF, #060B5E)' }}>
-                    {idx + 1}
+                  <div className="module-badge">
+                    {String(idx + 1).padStart(2, '0')}
                   </div>
-                  <div className="module-text">{t.label}</div>
+                  <div className="module-content">
+                    <div className="module-text">{t.label}</div>
+                  </div>
+                  <div className="module-arrow">→</div>
                 </div>
               ))}
             </div>
@@ -744,13 +771,13 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         {/* What You'll Walk Away With Section */}
         <div className="walk-away-section anim-card delay-2 stagger-container">
           <div style={{ textAlign: 'left', marginBottom: '2rem' }}>
-            <h2 className="premium-heading" style={{ fontSize: '2rem' }}>What You'll Walk Away With</h2>
+            <h2 className="premium-heading">What You'll Walk Away With</h2>
           </div>
           
           <div className="premium-feature-grid">
             <div className="premium-feature-card">
               <div className="feature-icon-wrapper">
-                <Zap size={24} />
+                <Briefcase size={24} />
               </div>
               <h4>Job-Ready Skills</h4>
               <p>Learn the core tools that every employer looks for — from day one.</p>
@@ -758,7 +785,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
             
             <div className="premium-feature-card">
               <div className="feature-icon-wrapper">
-                <Target size={24} />
+                <TrendingUp size={24} />
               </div>
               <h4>Live Campaign Practice</h4>
               <p>Run actual ad campaigns and projects with real budgets during the course.</p>
@@ -766,7 +793,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
             
             <div className="premium-feature-card">
               <div className="feature-icon-wrapper">
-                <Sparkles size={24} />
+                <Wrench size={24} />
               </div>
               <h4>50+ Premium Tools</h4>
               <p>Hands-on access to industry-leading tools used by top agencies and brands.</p>
@@ -774,7 +801,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
             
             <div className="premium-feature-card">
               <div className="feature-icon-wrapper">
-                <Star size={24} />
+                <Handshake size={24} />
               </div>
               <h4>Placement Support</h4>
               <p>250+ hiring partners across agencies, brands and startups — ready to hire you.</p>
@@ -786,7 +813,7 @@ export default function CourseDetail({ slug, onBack, onOpenEnrollModal }) {
         <div className="academy-content-section glass-card anim-card delay-3 fluid-mesh-bg" style={{ color: 'white' }}>
           <div className="academy-content-inner">
             <div className="academy-content-text pill-container-wrapper" style={{ textAlign: 'center', maxWidth: '100%', margin: '0 auto', padding: '0 1rem' }}>
-              <h2 className="text-reveal" style={{ color: 'white', marginBottom: '1.5rem', fontSize: '2.5rem', fontWeight: 600, WebkitTextFillColor: 'initial', background: 'none' }}>Why Choose Nextal Academy?</h2>
+              <h2 className="text-reveal" style={{ color: 'white', marginBottom: '1.5rem', fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 600, WebkitTextFillColor: 'initial', background: 'none' }}>Why Choose Nextal Academy?</h2>
               <p className="text-reveal" style={{ color: 'lightgrey', fontSize: '1.1rem', marginBottom: '3rem', lineHeight: '1.7', animationDelay: '0.1s' }}>
                 We believe the best way to learn is through practical experience. <br/>
                 Our industry-focused curriculum helps you master professional techniques while working on real projects.

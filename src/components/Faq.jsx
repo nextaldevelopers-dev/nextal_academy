@@ -28,8 +28,18 @@ export default function Faq() {
     }
   ];
 
-  // Auto-play removed for better UX and to fix index misalignment on mobile
+  const [isManual, setIsManual] = useState(false);
 
+  // Auto-play accordion that stops when manually interacted with
+  useEffect(() => {
+    if (isPaused || isManual) return;
+    
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % faqs.length);
+    }, 4000); // Cycle every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [isPaused, isManual, faqs.length]);
   return (
     <section id="faq" className="section" style={{ backgroundColor: '#ffffff' }}>
       <div className="container">
@@ -49,35 +59,40 @@ export default function Faq() {
           {faqs.map((faq, idx) => {
             const isActive = activeIndex === idx;
             return (
-              <div key={idx} className={`faq-card anim-card ${isActive ? 'active' : ''}`} style={{ '--card-index': idx + 3 }}>
-                <button 
-                  className="faq-header" 
-                  onClick={() => setActiveIndex(isActive ? -1 : idx)}
-                  aria-expanded={isActive}
-                  aria-controls={`faq-answer-${idx}`}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    background: 'none',
-                    border: 'none',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    color: 'inherit'
-                  }}
-                >
-                  <span>{faq.q}</span>
-                  <div className="faq-icon">
-                    <ChevronDown size={18} />
+              <div key={idx} className="anim-card" style={{ '--card-index': idx + 3 }}>
+                <div className={`faq-card ${isActive ? 'active' : ''}`}>
+                  <button 
+                    className="faq-header" 
+                    onClick={() => {
+                      setIsManual(true);
+                      setActiveIndex(isActive ? -1 : idx);
+                    }}
+                    aria-expanded={isActive}
+                    aria-controls={`faq-answer-${idx}`}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                      background: 'none',
+                      border: 'none',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      color: 'inherit'
+                    }}
+                  >
+                    <span>{faq.q}</span>
+                    <div className="faq-icon">
+                      <ChevronDown size={18} />
+                    </div>
+                  </button>
+                  <div 
+                    id={`faq-answer-${idx}`}
+                    className="faq-body"
+                  >
+                    {faq.a}
                   </div>
-                </button>
-                <div 
-                  id={`faq-answer-${idx}`}
-                  className="faq-body"
-                >
-                  {faq.a}
                 </div>
               </div>
             );

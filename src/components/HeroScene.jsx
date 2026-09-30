@@ -39,7 +39,7 @@ export default function HeroScene({ isMobile }) {
         <directionalLight position={[10, 10, 5]} intensity={1.5} />
         <spotLight position={[-5, 5, -5]} intensity={4} color="#ffffff" />
         <spotLight position={[0, -5, 2]} intensity={3} color="#00C896" angle={0.5} penumbra={1} />
-        <Environment files="/potsdamer_platz_1k.hdr" />
+        <Environment files="/potsdamer_platz_256.hdr" />
         <Suspense fallback={null}>
           <RobotCat 
             position={isMobile ? [0, -3.5, 0] : [0.2, -4.5, 0]} 

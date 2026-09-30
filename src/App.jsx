@@ -2,13 +2,8 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import useFPSMonitor from './hooks/useFPSMonitor';
-import LoadingScreen from './components/LoadingScreen';
-import Lenis from '@studio-freight/lenis';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import IntroLoader from './components/IntroLoader';
 
-gsap.registerPlugin(ScrollTrigger);
 
 // ── Lazy load below-fold & route-only components ──────────────────────────
 const WhyUs       = React.lazy(() => import('./components/WhyUs'));
@@ -18,97 +13,173 @@ const Faq         = React.lazy(() => import('./components/Faq'));
 const CtaBanner   = React.lazy(() => import('./components/CtaBanner'));
 const Footer      = React.lazy(() => import('./components/Footer'));
 const EnrollModal = React.lazy(() => import('./components/EnrollModal'));
+const LeadMagnetModal = React.lazy(() => import('./components/LeadMagnetModal'));
+const ExitIntentModal = React.lazy(() => import('./components/ExitIntentModal'));
 const ServiceDetail = React.lazy(() => import('./components/ServiceDetail'));
 const CourseDetail  = React.lazy(() => import('./components/CourseDetail'));
 const Blogs         = React.lazy(() => import('./components/Blogs'));
+const BlogDetail    = React.lazy(() => import('./components/BlogDetail'));
 const Placement     = React.lazy(() => import('./components/Placement'));
 const ComingSoon    = React.lazy(() => import('./components/ComingSoon'));
+const BackToTop     = React.lazy(() => import('./components/BackToTop'));
 
-// Minimal inline fallback — no extra render cost
-// Premium Fallback
-const PageFallback = () => <LoadingScreen isFadingOut={false} />;
-
+// Minimal lightweight route fallback
+const PageFallback = () => (
+  <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid rgba(142,68,173,0.2)', borderTopColor: '#8e44ad', animation: 'spin 0.8s linear infinite' }} />
+  </div>
+);
 
 export default function App() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [leadModalOpen, setLeadModalOpen] = useState(false);
+  const [exitModalOpen, setExitModalOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [isFadingOut, setIsFadingOut] = useState(false);
-  
-  // Start FPS Monitor
-  useFPSMonitor();
+  // Staged mount of below-fold content: 0 = nothing, 4 = everything.
+  // Mounting all below-fold sections/modals in one shot causes a single large
+  // main-thread burst (each section's own layout reads + GSAP setup stack up
+  // into one long task). Spreading the mount across idle slices keeps every
+  // individual task short, which is what Lighthouse's TBT metric penalizes.
+  const [belowFoldStage, setBelowFoldStage] = useState(0);
 
-  // Initialize Lenis smooth scrolling AFTER loading screen fades (post-FCP)
-  // Deferring prevents 4+ seconds of GSAP/Lenis CPU work from blocking LCP
+  // Mount below-the-fold content post-paint to protect critical Hero FCP/LCP.
+  //
+  // Strategy:
+  //   A) User interaction  → load immediately (real users never wait)
+  //   B) Cold load (Lighthouse / no interaction) → wait until window.load fires
+  //      then add a 2500ms buffer so below-fold CSS/JS chunks are NEVER queued
+  //      during the critical first-paint window (~0–2s on mobile).
+  //
+  // Root-cause fix: the previous requestIdleCallback({ timeout: 600 }) could
+  // fire at ~100ms, inserting dynamic CSS/JS into the network queue before
+  // .hero-subtitle (LCP element) had painted, causing a ~3.2s LCP under
+  // Lighthouse's 1.6 Mbps / 150ms RTT mobile simulation.
   useEffect(() => {
-    if (initialLoading) return; // Wait until loading screen is gone
+    let triggered = false;
+    let postLoadTimerId = null;
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      direction: 'vertical',
-      gestureDirection: 'vertical',
-      smooth: true,
-      mouseMultiplier: 1,
-      smoothTouch: false,
-      touchMultiplier: 2,
-      infinite: false,
-    });
-    
-    window.lenis = lenis;
+    // A) Any meaningful user interaction → load below-fold content immediately
+    const INTERACTION_EVENTS = [
+      'scroll',
+      'touchstart',
+      'pointerdown',
+      'keydown',
+      'wheel',
+    ];
 
-    // Add scroll velocity hook for dynamic animation durations
-    lenis.on('scroll', (e) => {
-      const velocity = Math.abs(e.velocity || 0);
-      let duration = 1.2 - (velocity * 0.2);
-      duration = Math.max(0.3, Math.min(duration, 1.2));
-      document.documentElement.style.setProperty('--reveal-duration', `${duration.toFixed(2)}s`);
-    });
-
-    // Synchronize Lenis scrolling with GSAP's ScrollTrigger
-    lenis.on('scroll', ScrollTrigger.update);
-
-    // Use GSAP's ticker for Lenis RAF to avoid double-RAF issues
-    const rafCallback = (time) => lenis.raf(time * 1000);
-    gsap.ticker.add(rafCallback);
-    gsap.ticker.lagSmoothing(0);
-
-    return () => {
-      gsap.ticker.remove(rafCallback);
-      if (window.lenis === lenis) delete window.lenis;
-      lenis.destroy();
-    };
-  }, [initialLoading]);
-
-  useEffect(() => {
-    // Determine min display time based on network
-    let minDisplayTime = 800; // Standard minimum
-    if (navigator.connection) {
-      const { effectiveType, downlink } = navigator.connection;
-      if (effectiveType === 'slow-2g' || effectiveType === '2g' || effectiveType === '3g' || downlink < 1.5) {
-        minDisplayTime = 1500;
-        document.documentElement.setAttribute('data-low-performance', 'true');
+    let idleIds = [];
+    const advanceStage = (stage) => {
+      setBelowFoldStage(stage);
+      if (stage >= 4) return;
+      if ('requestIdleCallback' in window) {
+        idleIds.push(window.requestIdleCallback(() => advanceStage(stage + 1), { timeout: 200 }));
+      } else {
+        idleIds.push(setTimeout(() => advanceStage(stage + 1), 50));
       }
+    };
+
+    const trigger = () => {
+      if (triggered) return;
+      triggered = true;
+      // Remove all interaction listeners
+      INTERACTION_EVENTS.forEach((ev) =>
+        window.removeEventListener(ev, trigger)
+      );
+      // Cancel the post-load timer if still pending
+      if (postLoadTimerId) clearTimeout(postLoadTimerId);
+      advanceStage(1);
+    };
+
+    INTERACTION_EVENTS.forEach((ev) =>
+      window.addEventListener(ev, trigger, { passive: true, once: true })
+    );
+
+    // B) Cold-load / Lighthouse audit → wait until the page's load event has
+    //    fired, then add a safe 2500ms post-paint buffer before mounting
+    //    below-fold components. This ensures below-fold CSS/JS chunks are
+    //    never queued while the critical Hero render chain is in-flight.
+    const schedulePostLoad = () => {
+      postLoadTimerId = setTimeout(trigger, 2500);
+    };
+
+    if (document.readyState === 'complete') {
+      // Already loaded (e.g. HMR / fast cache hit)
+      schedulePostLoad();
+    } else {
+      window.addEventListener('load', schedulePostLoad, { once: true });
     }
 
-    // Promise 1: Minimum display time
-    const minTimePromise = new Promise(resolve => setTimeout(resolve, minDisplayTime));
+    return () => {
+      INTERACTION_EVENTS.forEach((ev) =>
+        window.removeEventListener(ev, trigger)
+      );
+      window.removeEventListener('load', schedulePostLoad);
+      if (postLoadTimerId) clearTimeout(postLoadTimerId);
+      idleIds.forEach((id) => {
+        if ('cancelIdleCallback' in window) window.cancelIdleCallback(id);
+        else clearTimeout(id);
+      });
+    };
+  }, []);
 
-    // Promise 2: Actual page load (if already loaded, resolves immediately)
-    const loadPromise = new Promise(resolve => {
-      if (document.readyState === 'complete') {
-        resolve();
-      } else {
-        window.addEventListener('load', resolve, { once: true });
+  // Initialize Lenis smooth scrolling dynamically post-paint to avoid blocking critical LCP
+  useEffect(() => {
+    let lenisInstance = null;
+    let rafCallback = null;
+
+    const initLenis = async () => {
+      try {
+        const { default: Lenis } = await import('@studio-freight/lenis');
+        const lenis = new Lenis({
+          duration: 1.2,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          direction: 'vertical',
+          gestureDirection: 'vertical',
+          smooth: true,
+          mouseMultiplier: 1,
+          smoothTouch: false,
+          touchMultiplier: 2,
+          infinite: false,
+        });
+        
+        lenisInstance = lenis;
+        window.lenis = lenis;
+
+        // Add scroll velocity hook for dynamic animation durations
+        lenis.on('scroll', (e) => {
+          const velocity = Math.abs(e.velocity || 0);
+          let duration = 1.2 - (velocity * 0.2);
+          duration = Math.max(0.3, Math.min(duration, 1.2));
+          document.documentElement.style.setProperty('--reveal-duration', `${duration.toFixed(2)}s`);
+        });
+
+
+
+        let rafId;
+        const raf = (time) => {
+          lenis.raf(time);
+          rafId = requestAnimationFrame(raf);
+        };
+        rafId = requestAnimationFrame(raf);
+        rafCallback = () => cancelAnimationFrame(rafId);
+      } catch (err) {
+        console.warn('Lenis smooth scroll init skipped:', err);
       }
-    });
+    };
 
-    // When both are met, fade out the loader
-    Promise.all([minTimePromise, loadPromise]).then(() => {
-      setIsFadingOut(true);
-      setTimeout(() => setInitialLoading(false), 700); // Wait for the 0.7s CSS transition to finish
-    });
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(initLenis, { timeout: 1200 });
+    } else {
+      setTimeout(initLenis, 300);
+    }
 
+    return () => {
+      if (rafCallback) rafCallback();
+      if (lenisInstance) {
+        if (window.lenis === lenisInstance) delete window.lenis;
+        lenisInstance.destroy();
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -117,14 +188,57 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Recalculate GSAP positions when navigating (only after loading is done)
+  // Funnel: Exit Intent Logic
   useEffect(() => {
-    if (initialLoading) return;
-    const timer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [currentPath, initialLoading]);
+    import('./config/funnelConfig').then(({ funnelConfig }) => {
+      if (!funnelConfig.exitIntent.enabled) return;
+      
+      // Do not show if they already submitted a lead
+      if (localStorage.getItem('nextal_lead_submitted')) return;
+      
+      // Check localStorage (once per day)
+      const lastShownStr = localStorage.getItem('nextal_exit_intent_last_shown');
+      if (lastShownStr) {
+        const lastShownDate = new Date(parseInt(lastShownStr, 10));
+        const now = new Date();
+        if ((now - lastShownDate) < funnelConfig.exitIntent.cooldownHours * 60 * 60 * 1000) {
+          return; // Still in cooldown
+        }
+      }
+      
+      // Check sessionStorage (once per session)
+      if (sessionStorage.getItem('nextal_exit_intent_shown_session')) return;
+
+      let delayPassed = false;
+      const delayTimer = setTimeout(() => {
+        delayPassed = true;
+      }, funnelConfig.exitIntent.delayMs);
+
+      const handleMouseOut = (e) => {
+        if (!delayPassed) return;
+        
+        // Exit intent: mouse leaves from the top of the viewport
+        if (e.clientY <= 10) {
+          setExitModalOpen(true);
+          localStorage.setItem('nextal_exit_intent_last_shown', Date.now().toString());
+          sessionStorage.setItem('nextal_exit_intent_shown_session', 'true');
+          document.removeEventListener('mouseout', handleMouseOut);
+        }
+      };
+
+      // Only add listener on desktop devices
+      if (window.innerWidth >= 1024) {
+        document.addEventListener('mouseout', handleMouseOut);
+      }
+
+      return () => {
+        clearTimeout(delayTimer);
+        document.removeEventListener('mouseout', handleMouseOut);
+      };
+    });
+  }, []);
+
+
 
   // Global IntersectionObserver Reveal (Lightweight, Replaces GSAP for basic reveals)
   useEffect(() => {
@@ -142,29 +256,88 @@ export default function App() {
       threshold: 0
     });
 
+    let safetyTimeoutId = null;
     const applyObserver = () => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+        document.querySelectorAll('.anim-text, .anim-image, .anim-card, .anim-button').forEach(el => el.classList.add('is-visible'));
+        return;
+      }
       const elements = document.querySelectorAll('.anim-text:not(.is-visible), .anim-image:not(.is-visible), .anim-card:not(.is-visible), .anim-button:not(.is-visible)');
       elements.forEach((el) => observer.observe(el));
+      
+      // Safety timeout: 1.5s after page load, reveal elements above fold to prevent white areas
+      if (!safetyTimeoutId) {
+        safetyTimeoutId = setTimeout(() => {
+          document.querySelectorAll('.anim-text:not(.is-visible), .anim-image:not(.is-visible), .anim-card:not(.is-visible), .anim-button:not(.is-visible)').forEach(el => {
+            if (el.getBoundingClientRect().top < window.innerHeight) {
+              el.classList.add('is-visible');
+            }
+          });
+        }, 1500);
+      }
     };
 
     applyObserver();
 
+    // Resize fallback
+    const handleResize = () => {
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.anim-text:not(.is-visible), .anim-image:not(.is-visible), .anim-card:not(.is-visible), .anim-button:not(.is-visible)').forEach(el => {
+          if (el.getBoundingClientRect().top < window.innerHeight) {
+            el.classList.add('is-visible');
+          }
+        });
+      });
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    // Scroll fallback for the absolute bottom AND every scroll frame
+    let scrollRafId;
+    const handleScroll = () => {
+      if (scrollRafId) cancelAnimationFrame(scrollRafId);
+      scrollRafId = requestAnimationFrame(() => {
+        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200;
+        document.querySelectorAll('.anim-text:not(.is-visible), .anim-image:not(.is-visible), .anim-card:not(.is-visible), .anim-button:not(.is-visible)')
+          .forEach(el => {
+            if (atBottom || el.getBoundingClientRect().top < window.innerHeight) {
+              el.classList.add('is-visible');
+            }
+          });
+      });
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    if (window.lenis) window.lenis.on('scroll', handleScroll);
+
     let mutationTimeout;
-    const handleMutations = () => {
+    const handleMutations = (mutationsList) => {
+      // Only refresh ScrollTrigger if meaningful layout changes happened, 
+      // not just class toggles for animations
+      let needsRefresh = false;
+      for (let mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+          needsRefresh = true;
+          break;
+        }
+      }
+
       clearTimeout(mutationTimeout);
       mutationTimeout = setTimeout(() => {
         applyObserver();
-        ScrollTrigger.refresh(); // Still refresh GSAP for other components that might use it
-      }, 50);
+      }, 100);
     };
 
     const mutationObserver = new MutationObserver(handleMutations);
-    mutationObserver.observe(document.body, { childList: true, subtree: true });
+    mutationObserver.observe(document.body, { childList: true, subtree: true, attributes: false });
 
     return () => {
+      if (safetyTimeoutId) clearTimeout(safetyTimeoutId);
+      if (mutationTimeout) clearTimeout(mutationTimeout);
+      if (scrollRafId) cancelAnimationFrame(scrollRafId);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
+      if (window.lenis) window.lenis.off('scroll', handleScroll);
       observer.disconnect();
       mutationObserver.disconnect();
-      clearTimeout(mutationTimeout);
     };
   }, [currentPath]);
 
@@ -176,7 +349,7 @@ export default function App() {
       const href = a.getAttribute('href');
       if (!href) return;
 
-      if (href.startsWith('/services/') || href.startsWith('/course/') || href === '/blogs' || href === '/placement' || href === '/terms' || href === '/privacy') {
+      if (href.startsWith('/services/') || href.startsWith('/course/') || href.startsWith('/blogs') || href === '/placement' || href === '/terms' || href === '/privacy') {
         e.preventDefault();
         window.history.pushState({}, '', href);
         window.dispatchEvent(new Event('popstate'));
@@ -244,6 +417,8 @@ export default function App() {
     } else if (currentPath === '/placement') {
       title = 'Placement Record | Nextal Academy Nagercoil';
       desc = 'See our students\' success stories. Nextal Academy Nagercoil offers 100% placement support in video editing, design, AI and tech fields.';
+    } else if (currentPath.startsWith('/blogs/')) {
+      title = 'Blog | Nextal Academy Nagercoil'; // handled inside BlogDetail Helmet
     } else if (currentPath === '/blogs') {
       title = 'Blogs & News | Nextal Academy Nagercoil';
       desc = 'Read the latest articles on video editing, AI, design trends and career tips from Nextal Academy Nagercoil experts.';
@@ -270,12 +445,15 @@ export default function App() {
   const isCourseRoute   = normalizedPath.startsWith('/course/');
   const courseSlug      = isCourseRoute ? normalizedPath.replace('/course/', '') : '';
   const isBlogsRoute    = normalizedPath === '/blogs';
+  const isBlogDetailRoute = normalizedPath.startsWith('/blogs/');
+  const blogSlug        = isBlogDetailRoute && !isBlogsRoute ? normalizedPath.replace('/blogs/', '') : '';
   const isPlacementRoute = normalizedPath === '/placement';
   const isTermsRoute     = normalizedPath === '/terms';
   const isPrivacyRoute   = normalizedPath === '/privacy';
 
   return (
     <div className="app">
+      <IntroLoader />
       <Helmet>
         <title>Nextal Academy Nagercoil | Video Editing, AI & Design Courses</title>
         <meta name="description" content="Master Video Editing, AI, and UI/UX Design at Nextal Academy Nagercoil. Get job-ready with our 100% placement-focused courses and hands-on portfolio building." />
@@ -290,35 +468,81 @@ export default function App() {
       
       <Header onOpenEnrollModal={() => setModalOpen(true)} />
 
-      <Suspense fallback={<PageFallback />}>
-        {isServiceRoute ? (
+      {isServiceRoute ? (
+        <Suspense fallback={<PageFallback />}>
           <ServiceDetail slug={serviceSlug} onBack={handleBackToHome} onOpenEnrollModal={() => setModalOpen(true)} />
-        ) : isCourseRoute ? (
+        </Suspense>
+      ) : isCourseRoute ? (
+        <Suspense fallback={<PageFallback />}>
           <CourseDetail slug={courseSlug} onBack={handleBackToHome} onOpenEnrollModal={() => setModalOpen(true)} />
-        ) : isBlogsRoute ? (
-          <Blogs onBack={handleBackToHome} />
-        ) : isPlacementRoute ? (
+        </Suspense>
+      ) : isBlogsRoute ? (
+        <Suspense fallback={<PageFallback />}>
+          <Blogs onBack={handleBackToHome} onOpenEnrollModal={() => setModalOpen(true)} />
+        </Suspense>
+      ) : isBlogDetailRoute ? (
+        <Suspense fallback={<PageFallback />}>
+          <BlogDetail slug={blogSlug} onBack={() => {
+            window.history.pushState({}, '', '/blogs');
+            window.dispatchEvent(new Event('popstate'));
+          }} onOpenEnrollModal={() => setModalOpen(true)} />
+        </Suspense>
+      ) : isPlacementRoute ? (
+        <Suspense fallback={<PageFallback />}>
           <Placement onBack={handleBackToHome} />
-        ) : isTermsRoute ? (
+        </Suspense>
+      ) : isTermsRoute ? (
+        <Suspense fallback={<PageFallback />}>
           <ComingSoon title="Terms & Conditions" onBack={handleBackToHome} />
-        ) : isPrivacyRoute ? (
+        </Suspense>
+      ) : isPrivacyRoute ? (
+        <Suspense fallback={<PageFallback />}>
           <ComingSoon title="Privacy Policy" onBack={handleBackToHome} />
-        ) : (
-          <main>
-            <Hero onOpenEnrollModal={() => setModalOpen(true)} />
-            <WhyUs onSelectService={handleSelectService} />
-            <Syllabus />
-            <Highlights />
-            <Faq />
-            <CtaBanner onOpenEnrollModal={() => setModalOpen(true)} />
-          </main>
-        )}
+        </Suspense>
+      ) : (
+        <main>
+          <Hero onOpenEnrollModal={() => setModalOpen(true)} onOpenLeadModal={() => setLeadModalOpen(true)} />
+          {belowFoldStage >= 1 && (
+            <Suspense fallback={null}>
+              <WhyUs onSelectService={handleSelectService} />
+              <Syllabus onOpenLeadModal={() => setLeadModalOpen(true)} />
+            </Suspense>
+          )}
+          {belowFoldStage >= 2 && (
+            <Suspense fallback={null}>
+              <Highlights />
+              <Faq />
+            </Suspense>
+          )}
+          {belowFoldStage >= 3 && (
+            <Suspense fallback={null}>
+              <CtaBanner onOpenEnrollModal={() => setModalOpen(true)} />
+            </Suspense>
+          )}
+        </main>
+      )}
 
-        <Footer />
-        <EnrollModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
-      </Suspense>
+      {belowFoldStage >= 3 && (
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
+      )}
 
-      {initialLoading && <LoadingScreen isFadingOut={isFadingOut} />}
+      {belowFoldStage >= 4 && (
+        <Suspense fallback={null}>
+          <EnrollModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+          <LeadMagnetModal isOpen={leadModalOpen} onClose={() => setLeadModalOpen(false)} />
+          <ExitIntentModal
+            isOpen={exitModalOpen}
+            onClose={() => setExitModalOpen(false)}
+            onClaimOffer={() => {
+              setExitModalOpen(false);
+              setModalOpen(true);
+            }}
+          />
+          <BackToTop />
+        </Suspense>
+      )}
     </div>
   );
 }

@@ -1,12 +1,12 @@
 import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { CheckCircle2, Award, Bot, Send, BookOpen, Clapperboard } from 'lucide-react';
-import gsap from 'gsap';
 
 const HeroScene = lazy(() => import('./HeroScene'));
 
-export default function Hero({ onOpenEnrollModal }) {
+export default function Hero({ onOpenEnrollModal, onOpenLeadModal }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
   const [shouldLoad3D, setShouldLoad3D] = useState(false);
+  const [speechStep, setSpeechStep] = useState(0);
   const heroRef = useRef(null);
 
   useEffect(() => {
@@ -16,60 +16,88 @@ export default function Hero({ onOpenEnrollModal }) {
   }, []);
 
   useEffect(() => {
-    let interactionFired = false;
+    const interval = setInterval(() => {
+      setSpeechStep(1);
+      setTimeout(() => {
+        setSpeechStep(2);
+        setTimeout(() => setSpeechStep(0), 4000);
+      }, 2500);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    let triggered = false;
     const load3D = () => {
-      if (!interactionFired) {
-        interactionFired = true;
-        if ('requestIdleCallback' in window) {
-          window.requestIdleCallback(() => setShouldLoad3D(true), { timeout: 1000 });
-        } else {
-          setShouldLoad3D(true);
-        }
+      if (triggered) return;
+      triggered = true;
+      setShouldLoad3D(true);
+    };
+
+    const scheduleLoad = () => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(load3D, { timeout: 2000 });
+      } else {
+        setTimeout(load3D, 500); // Short timeout fallback
       }
     };
 
-    const events = ['scroll', 'mousemove', 'touchstart', 'keydown'];
-    events.forEach(event => window.addEventListener(event, load3D, { once: true, passive: true }));
-
-    // Fallback if no interaction happens
-    const timeout = setTimeout(load3D, 4000);
+    if (document.readyState === 'complete') {
+      scheduleLoad();
+    } else {
+      window.addEventListener('load', scheduleLoad, { once: true });
+    }
 
     return () => {
-      events.forEach(event => window.removeEventListener(event, load3D));
-      clearTimeout(timeout);
+      window.removeEventListener('load', scheduleLoad);
     };
   }, []);
 
-  // GSAP Parallax & Zoom Effects
+  // GSAP Parallax & Zoom Effects — loaded dynamically post-paint so the
+  // ~45KB gzip gsap+ScrollTrigger chunk never blocks Hero's initial render
+  // (the parallax only matters once the user starts scrolling).
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Robot parallax & subtle zoom
-      gsap.to('.hero-media-wrapper', {
-        scale: 1.08,
-        y: 40,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true
-        }
-      });
+    let ctx;
+    let cancelled = false;
 
-      // Text parallax (moves up slightly faster)
-      gsap.to('.hero-content', {
-        y: -40,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true
-        }
-      });
-    }, heroRef);
+    Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(
+      ([{ default: gsap }, { ScrollTrigger }]) => {
+        if (cancelled) return;
+        gsap.registerPlugin(ScrollTrigger);
 
-    return () => ctx.revert();
+        ctx = gsap.context(() => {
+          // Robot parallax & subtle zoom
+          gsap.to('.hero-media-wrapper', {
+            scale: 1.08,
+            y: 40,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: 'top top',
+              end: 'bottom top',
+              scrub: true
+            }
+          });
+
+          // Text parallax (moves up slightly faster)
+          gsap.to('.hero-content', {
+            y: -40,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: 'top top',
+              end: 'bottom top',
+              scrub: true
+            }
+          });
+        }, heroRef);
+      }
+    );
+
+    return () => {
+      cancelled = true;
+      if (ctx) ctx.revert();
+    };
   }, []);
 
   return (
@@ -77,10 +105,16 @@ export default function Hero({ onOpenEnrollModal }) {
       <div className="hero-container">
         <div className="hero-grid">
           <div className="hero-content">
+            
+            {isMobile && (
+              <div className="hero-eyebrow">
+                <span className="eyebrow-dot"></span> THE FUTURE STARTS HERE
+              </div>
+            )}
 
-            <h1 className="hero-title lcp-element anim-text" style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>
-              Master <span className="accent">Creative AI</span> &amp;
-              <br />
+            <h1 className="hero-title lcp-element" style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>
+              Master <span className="accent">Creative AI</span> &amp;{' '}
+              <br className="desktop-br-only" />
               Build Your Future
             </h1>
 
@@ -110,24 +144,58 @@ export default function Hero({ onOpenEnrollModal }) {
               <span style={{ fontSize: '1.2em', fontWeight: '900', letterSpacing: '0.15em' }}>BECOME</span>
             </div>
 
-            <p className="hero-subtitle lcp-element anim-text" style={{ maxWidth: '600px', color: '#d3d3d3' }}>
-              Premium Job-Oriented Academy in Nagercoil. Master Video Editing, Motion Graphics, Full Stack Development, and Advanced Generative AI to launch your dream career.
-            </p>
+            {!isMobile && (
+              <>
+                <p className="hero-subtitle lcp-element" style={{ maxWidth: '600px', color: '#d3d3d3' }}>
+                  Premium Job-Oriented Academy in Nagercoil. Master Video Editing, Motion Graphics, Full Stack Development, and Advanced Generative AI to launch your dream career.
+                </p>
 
-            <div className="hero-actions anim-button delay-5">
-              <button className="btn btn-primary" onClick={onOpenEnrollModal}>
-                <Send size={16} /> Apply For Admission
-              </button>
-              <a href="#syllabus" className="btn btn-secondary">
-                <BookOpen size={16} /> Explore Curriculum
-              </a>
-            </div>
+                <div className="hero-actions anim-button delay-5">
+                  <button className="btn btn-primary" onClick={onOpenEnrollModal}>
+                    <Send size={16} /> Apply For Admission
+                  </button>
+                  <button onClick={() => {
+                    if (window.gtag) window.gtag('event', 'syllabus_cta_click', { event_category: 'engagement', source: 'hero_desktop' });
+                    onOpenLeadModal();
+                  }} className="btn btn-secondary">
+                    <BookOpen size={16} /> Download Syllabus
+                  </button>
+                </div>
+              </>
+            )}
 
 
           </div>
 
         <div className="hero-media-wrapper">
-            <div className="hero-image-frame anim-image delay-5" style={{ background: 'transparent', padding: '0', boxShadow: 'none', border: 'none', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}>
+            <div className="hero-image-frame anim-image delay-5" style={{ position: 'relative', background: 'transparent', padding: '0', boxShadow: 'none', border: 'none', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}>
+              {/* Static Speech Bubble Overlay */}
+              <div style={{
+                position: 'absolute',
+                top: isMobile ? '15%' : '18%',
+                left: isMobile ? '10%' : '15%',
+                zIndex: 10,
+                opacity: speechStep > 0 ? 1 : 0,
+                transform: `translateY(${speechStep > 0 ? '0' : '15px'}) scale(${speechStep > 0 ? 1 : 0.5})`,
+                transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                pointerEvents: 'none',
+              }}>
+                <div className="robot-bubble">
+                  <span style={{ 
+                    fontSize: isMobile ? '0.9rem' : '1.25rem', 
+                    fontWeight: 700, 
+                    color: '#4B1D95', 
+                    whiteSpace: isMobile ? 'normal' : 'nowrap',
+                    maxWidth: isMobile ? '130px' : 'none',
+                    display: 'inline-block',
+                    textAlign: 'center',
+                    lineHeight: 1.2
+                  }}>
+                    {speechStep === 1 ? 'Hi!!' : 'Welcome To Nextal'}
+                  </span>
+                </div>
+              </div>
+
               {shouldLoad3D ? (
                 <Suspense fallback={
                   <div style={{ width: '100%', height: '100%', borderRadius: '20px', background: 'radial-gradient(circle at center, rgba(142, 68, 173, 0.15) 0%, rgba(0, 0, 0, 0) 70%)', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
@@ -139,6 +207,26 @@ export default function Hero({ onOpenEnrollModal }) {
               )}
             </div>
           </div>
+
+          {isMobile && (
+            <div className="hero-mobile-bottom-content" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <p className="hero-subtitle lcp-element" style={{ maxWidth: '600px', color: '#d3d3d3' }}>
+                Learn creative AI skills, build real projects, and grow your career.
+              </p>
+
+              <div className="hero-actions anim-button delay-5">
+                <button className="btn btn-primary" onClick={onOpenEnrollModal}>
+                  <Send size={16} /> Apply For Admission
+                </button>
+                <button onClick={() => {
+                  if (window.gtag) window.gtag('event', 'syllabus_cta_click', { event_category: 'engagement', source: 'hero_mobile' });
+                  onOpenLeadModal();
+                }} className="btn btn-secondary">
+                  <BookOpen size={16} /> Download Syllabus
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
