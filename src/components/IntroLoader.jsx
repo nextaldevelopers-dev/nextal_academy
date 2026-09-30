@@ -62,7 +62,7 @@ export default function IntroLoader() {
       <div className="intro-content">
         <div className="intro-logo-wrap">
           <img
-            src="/academy_logo.webp"
+            src="/academy_logo-320.webp"
             alt=""
             width="64"
             height="64"

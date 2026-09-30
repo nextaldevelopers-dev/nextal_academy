@@ -255,7 +255,7 @@ export default function BlogDetail({ slug, onBack, onOpenEnrollModal }) {
                 <div className="meta-row">
                   <span className="meta-label">WRITTEN BY</span>
                   <span className="meta-val flex-val">
-                    <img src="/academy_logo.webp" alt="Nextal" className="author-avatar" />
+                    <img src="/academy_logo-320.webp" alt="Nextal" className="author-avatar" />
                     {blog.author}
                   </span>
                 </div>

@@ -43,7 +43,7 @@ jobs:
         run: sudo apt-get install -y sshpass
 
       # ── 7. Deploy via rsync with SSH password ────────────────────────────
-      # Old hashed build files are KEPT (not deleted) so visitors whose browser still has
+      # Nothing outside public_html/assets is ever deleted. Old hashed build files are KEPT so visitors whose browser still has
       # the previous page cached can load the files it asks for. Files older than 30 days
       # are cleaned up at the end.
       - name: 🌐 Deploy via rsync
@@ -54,8 +54,9 @@ jobs:
             ./dist/assets/ \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/u838392794/public_html/assets/
 
-          # b) Upload everything else (index.html last-effective), removing stale non-asset files
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" rsync -avz --delete --exclude 'assets/' \
+          # b) Upload everything else. NO --delete: public_html also holds other projects
+          #    (e.g. the /landing-page folder), and --delete would erase anything not in dist/.
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" rsync -avz --exclude 'assets/' \
             -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
             ./dist/ \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/u838392794/public_html/

@@ -2067,3 +2067,11 @@ html[data-low-performance="true"] .center-card-energy-halo {
   outline-offset: 4px;
 }
 
+/* Hero is on screen at page load: show it immediately instead of fading in.
+   Fading content in the first screen delays 'visually complete' (Speed Index). */
+.hero-section .anim-text, .hero-section .anim-button, .hero-section .anim-image,
+.hero-section .anim-card, .hero-section .anim-badge {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}

@@ -2,7 +2,8 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import IntroLoader from './components/IntroLoader';
+// IntroLoader (full-screen splash) is switched off: it hid the already-loaded hero and hurt Speed Index.
+// To bring it back: re-add `import IntroLoader from './components/IntroLoader';` and `<IntroLoader />` below.
 import { lazyWithReload } from './utils/lazyWithReload';
 import { SafeSuspense } from './ErrorBoundary';
 
@@ -468,7 +469,6 @@ export default function App() {
 
   return (
     <div className="app">
-      <IntroLoader />
       <Helmet>
         <title>Nextal Academy Nagercoil | Video Editing, AI & Design Courses</title>
         <meta name="description" content="Master Video Editing, AI, and UI/UX Design at Nextal Academy Nagercoil. Get job-ready with our 100% placement-focused courses and hands-on portfolio building." />
